@@ -398,11 +398,11 @@
             </form>
 
             <!-- ปุ่มกดเลือกคิวตัวอย่าง -->
-            <div class="flex items-center flex-wrap gap-1.5 text-[11px] text-princess-textMuted">
+            <div id="sampleQueueButtons" class="flex items-center flex-wrap gap-1.5 text-[11px] text-princess-textMuted">
                 <span>ตัวอย่าง:</span>
-                <button type="button" onclick="quickFillSearch('A123')" class="px-2.5 py-0.5 rounded-full bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200/70 font-medium transition">A123</button>
-                <button type="button" onclick="quickFillSearch('B042')" class="px-2.5 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/70 font-medium transition">B042</button>
-                <button type="button" onclick="quickFillSearch('B045')" class="px-2.5 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/70 font-medium transition">B045</button>
+                <button type="button" onclick="quickFillSearch('YN001')" class="px-2.5 py-0.5 rounded-full bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200/70 font-medium transition">YN001</button>
+                <button type="button" onclick="quickFillSearch('YN002')" class="px-2.5 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/70 font-medium transition">YN002</button>
+                <button type="button" onclick="quickFillSearch('YN004')" class="px-2.5 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/70 font-medium transition">YN004</button>
             </div>
 
             <!-- ผลลัพธ์การค้นหาแบบกระชับ -->
@@ -434,7 +434,7 @@
                             กำลังดำเนินการอยู่ตอนนี้
                         </div>
                         <div id="activeMascotText" class="font-cute font-bold text-sm sm:text-base text-princess-textDark truncate">
-                            คิว A123 • กำลังให้บริการ
+                            คิว YN001 • กำลังให้บริการ
                         </div>
                         <div class="text-[11px] text-princess-textMuted flex items-center gap-1">
                             <span>แตะเพื่อดู % ความคืบหน้าและรูปงาน</span>
@@ -466,7 +466,7 @@
         </section>
 
         <!-- ==========================================
-             ส่วนที่ 5: ส่วนช่องทางติดต่อ
+             ส่วนที่ 5: ส่วนช่องทางติดต่อ (3 ช่องทางตามแบบร่าง)
         =========================================== -->
         <section id="contactSection" class="glass-card rounded-3xl p-4 sm:p-5 shadow-princess space-y-3">
             <div>
@@ -474,175 +474,248 @@
                     <i class="ph-fill ph-heart text-pink-500"></i>
                     ช่องทางติดต่อ
                 </h2>
-                <p class="text-xs text-princess-textMuted mt-0.5">ติดต่อสอบถามข้อมูลเพิ่มเติมหรือสั่งจองคิวได้ที่</p>
+                <p class="text-xs text-princess-textMuted">ติดต่อสอบถามข้อมูลเพิ่มเติมได้ที่</p>
             </div>
 
             <div class="grid grid-cols-3 gap-2.5">
-                <button type="button" onclick="openContactInfo('phone')" class="p-3 rounded-2xl bg-gradient-to-b from-pink-50 to-white border border-pink-200/80 hover:border-pink-300 hover:-translate-y-0.5 transition flex flex-col items-center text-center gap-1.5 shadow-sm">
-                    <span class="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-sm">
-                        <i class="ph-fill ph-phone-call text-lg"></i>
+                <button type="button" onclick="openContactInfo('phone')" class="p-3 rounded-2xl bg-pink-50/90 hover:bg-pink-100/90 border border-pink-200/80 flex flex-col items-center text-center gap-1.5 transition group">
+                    <span class="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-400 to-purple-400 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition">
+                        <i class="ph-fill ph-phone text-lg"></i>
                     </span>
                     <span class="font-semibold text-xs text-princess-textDark">โทรศัพท์</span>
-                    <span class="text-[10px] text-princess-textMuted">กดเพื่อโทร</span>
+                    <span class="text-[10px] text-princess-textMuted">กดเพื่อดูเบอร์</span>
                 </button>
 
-                <button type="button" onclick="openContactInfo('line')" class="p-3 rounded-2xl bg-gradient-to-b from-purple-50 to-white border border-purple-200/80 hover:border-purple-300 hover:-translate-y-0.5 transition flex flex-col items-center text-center gap-1.5 shadow-sm">
-                    <span class="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-sm">
+                <button type="button" onclick="openContactInfo('line')" class="p-3 rounded-2xl bg-purple-50/90 hover:bg-purple-100/90 border border-purple-200/80 flex flex-col items-center text-center gap-1.5 transition group">
+                    <span class="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-400 to-pink-400 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition">
                         <i class="ph-fill ph-chat-circle-dots text-lg"></i>
                     </span>
                     <span class="font-semibold text-xs text-princess-textDark">LINE</span>
                     <span class="text-[10px] text-princess-textMuted">กดเพื่อแชท</span>
                 </button>
 
-                <button type="button" onclick="openContactInfo('message')" class="p-3 rounded-2xl bg-gradient-to-b from-rose-50 to-white border border-rose-200/80 hover:border-rose-300 hover:-translate-y-0.5 transition flex flex-col items-center text-center gap-1.5 shadow-sm">
-                    <span class="w-10 h-10 rounded-full bg-rose-400 text-white flex items-center justify-center shadow-sm">
-                        <i class="ph-fill ph-envelope-simple-open text-lg"></i>
+                <button type="button" onclick="openContactInfo('message')" class="p-3 rounded-2xl bg-pink-50/90 hover:bg-pink-100/90 border border-pink-200/80 flex flex-col items-center text-center gap-1.5 transition group">
+                    <span class="w-10 h-10 rounded-full bg-gradient-to-tr from-pink-400 to-purple-400 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition">
+                        <i class="ph-fill ph-envelope-simple text-lg"></i>
                     </span>
                     <span class="font-semibold text-xs text-princess-textDark">ข้อความ</span>
-                    <span class="text-[10px] text-princess-textMuted">กดเพื่อส่งข้อความ</span>
+                    <span class="text-[10px] text-princess-textMuted">กดส่งข้อความ</span>
                 </button>
             </div>
         </section>
-
-        <!-- ฟุตเตอร์เล็กๆ -->
-        <footer class="text-center text-[11px] text-princess-textMuted/80 pt-2">
-            © Yai Nori Studio • ระบบเช็คคิวออนไลน์ (Demo)
-        </footer>
     </main>
-
-    <!-- ==========================================
-         ปุ่มแผ่นเสียง CD สไตล์ตามแบบแนบ (อยู่มุมซ้ายค่อนกลางล่าง ไม่ล่างสุด)
-    =========================================== -->
-    <div id="vinylWidget" class="fixed left-3 sm:left-5 bottom-24 sm:bottom-28 z-40 select-none">
-        <div id="musicNotesContainer" class="relative">
-            <button type="button" onclick="toggleMusicPlayer()" aria-label="เปิดหรือปิดเพลง" title="แตะเพื่อเปิด/ปิดเพลง" class="relative w-16 h-16 sm:w-[70px] sm:h-[70px] rounded-full p-1 bg-white shadow-[0_8px_22px_rgba(236,72,153,0.28)] hover:scale-105 active:scale-95 transition-transform focus:outline-none">
-                <!-- แผ่น CD ด้านในที่หมุนได้ -->
-                <div id="vinylDisc" class="relative w-full h-full rounded-full p-[3px] bg-gradient-to-tr from-pink-300 via-purple-200 to-pink-200 flex items-center justify-center overflow-hidden">
-                    <div class="w-full h-full rounded-full p-[2px] bg-white overflow-hidden relative flex items-center justify-center">
-                        <img id="vinylLogoImg"
-                             src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
-                             onerror="this.src='https://placehold.co/120x120/FCE7F3/9333EA?text=CD'"
-                             alt="CD Cover"
-                             class="w-full h-full object-cover rounded-full opacity-95">
-                        <!-- รูตรงกลางแผ่น CD -->
-                        <div class="absolute w-5 h-5 rounded-full bg-white border-[3.5px] border-pink-300/90 shadow-inner"></div>
-                    </div>
-                </div>
-                <!-- ป้ายกลมตัวโน้ตมุมขวาล่างตามภาพตัวอย่าง -->
-                <span id="vinylNoteBadge" class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-pink-100 to-purple-100 border-2 border-white shadow-md flex items-center justify-center text-pink-600">
-                    <i id="vinylNoteIcon" class="ph-fill ph-music-note text-sm"></i>
-                </span>
-            </button>
-        </div>
-    </div>
-
-    <!-- ==========================================
-         มาสคอตข้อความอัตโนมัติ (มุมขวาล่าง กำหนดข้อความเดียวหรือหลายข้อความได้หลังบ้าน)
-    =========================================== -->
-    <div id="floatingMascotWidget" class="fixed right-3 sm:right-5 bottom-16 sm:bottom-20 z-40 flex flex-col items-end gap-2 max-w-[235px] sm:max-w-[265px] select-none pointer-events-none">
-        <div id="mascotAutoBubble"
-             onclick="window.cycleMascotMessageNow(true)"
-             title="แตะเพื่อเปลี่ยนข้อความถัดไป"
-             class="pointer-events-auto bg-white/95 backdrop-blur-md border border-pink-200 shadow-princess-sm rounded-2xl rounded-br-sm px-4 py-2.5 text-xs sm:text-[13px] text-princess-textDark leading-snug cursor-pointer transition-opacity duration-500 text-center">
-            ยินดีต้อนรับสู่ Yai Nori ค่ะ 🎀
-        </div>
-        <button type="button" onclick="window.cycleMascotMessageNow(true)" class="pointer-events-auto shrink-0 focus:outline-none hover:scale-105 transition-transform">
-            <img id="floatingMascotPng"
-                 src="https://i.postimg.cc/pLZ4BnRS/IMG-5175.png"
-                 onerror="this.src='https://placehold.co/80x80/FCE7F3/9333EA?text=YN'"
-                 alt="Yai Nori Mascot"
-                 class="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_6px_14px_rgba(244,114,182,0.35)] animate-gentle-float">
-        </button>
-    </div>
 
     <!-- ==========================================
          แถบเมนูด้านข้าง (Drawer Menu)
     =========================================== -->
     <div id="drawerBackdrop" onclick="toggleDrawerMenu()" class="fixed inset-0 bg-[#4A2545]/40 backdrop-blur-xs z-50 hidden"></div>
-    <aside id="drawerMenu" class="fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-white/95 backdrop-blur-xl shadow-2xl border-l border-pink-100 z-50 translate-x-full transition-transform duration-300 flex flex-col p-5">
-        <div class="flex items-center justify-between pb-4 border-b border-pink-100">
-            <div class="flex items-center gap-2.5">
-                <img id="drawerLogo"
-                     src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
-                     onerror="this.src='https://placehold.co/80x80/FCE7F3/9333EA?text=YN'"
-                     alt="Logo"
-                     class="w-10 h-10 rounded-full object-cover border-2 border-pink-200">
-                <div>
-                    <div class="font-cute font-bold text-princess-textDark text-sm">Yai Nori</div>
-                    <div class="text-[11px] text-princess-textMuted">เมนูนำทาง</div>
+    <aside id="drawerMenu" class="fixed top-0 right-0 h-full w-72 max-w-[82vw] bg-white/95 backdrop-blur-xl z-50 shadow-2xl border-l border-pink-200 p-5 flex flex-col justify-between translate-x-full transition-transform duration-300">
+        <div class="space-y-5">
+            <div class="flex items-center justify-between pb-3 border-b border-pink-100">
+                <div class="flex items-center gap-2.5">
+                    <img id="drawerLogo" src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg" onerror="this.src='https://placehold.co/80x80/FCE7F3/9333EA?text=YN'" alt="Logo" class="w-10 h-10 rounded-full object-cover border border-pink-200">
+                    <div>
+                        <div class="font-cute font-bold text-sm text-princess-textDark">Yai Nori</div>
+                        <div class="text-[11px] text-princess-textMuted">เมนูนำทาง</div>
+                    </div>
                 </div>
+                <button type="button" onclick="toggleDrawerMenu()" class="w-8 h-8 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center">
+                    <i class="ph-bold ph-x"></i>
+                </button>
             </div>
-            <button type="button" onclick="toggleDrawerMenu()" class="w-8 h-8 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center hover:bg-pink-100">
-                <i class="ph-bold ph-x"></i>
-            </button>
+
+            <nav class="space-y-2 text-sm">
+                <button type="button" onclick="toggleDrawerMenu(); scrollToSection('topSection');" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium flex items-center gap-2.5 transition">
+                    <i class="ph-fill ph-house text-pink-500 text-lg"></i> หน้าแรก
+                </button>
+                <button type="button" onclick="toggleDrawerMenu(); scrollToSection('searchSection');" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium flex items-center gap-2.5 transition">
+                    <i class="ph-fill ph-magnifying-glass text-purple-500 text-lg"></i> เช็คคิวงาน
+                </button>
+                <button type="button" onclick="toggleDrawerMenu(); scrollToSection('queueListSection');" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium flex items-center gap-2.5 transition">
+                    <i class="ph-fill ph-chats-circle text-pink-500 text-lg"></i> คิวทั้งหมด
+                </button>
+                <button type="button" onclick="toggleDrawerMenu(); scrollToSection('contactSection');" class="w-full text-left px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium flex items-center gap-2.5 transition">
+                    <i class="ph-fill ph-heart text-purple-500 text-lg"></i> ช่องทางติดต่อ
+                </button>
+            </nav>
         </div>
 
-        <nav class="flex-1 py-4 space-y-2 text-sm">
-            <button type="button" onclick="scrollToSection('topSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
-                <i class="ph-fill ph-house text-pink-500 text-lg"></i> หน้าแรก
-            </button>
-            <button type="button" onclick="scrollToSection('searchSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
-                <i class="ph-fill ph-magnifying-glass text-purple-500 text-lg"></i> เช็คคิวงาน
-            </button>
-            <button type="button" onclick="scrollToSection('queueListSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
-                <i class="ph-fill ph-chats-circle text-pink-500 text-lg"></i> คิวทั้งหมด
-            </button>
-            <button type="button" onclick="scrollToSection('contactSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
-                <i class="ph-fill ph-heart text-rose-500 text-lg"></i> ช่องทางติดต่อ
-            </button>
-        </nav>
-
         <div class="pt-4 border-t border-pink-100">
-            <button type="button" onclick="toggleDrawerMenu(); toggleAdminModal();" class="w-full btn-princess py-3 rounded-2xl text-white font-semibold text-sm flex items-center justify-center gap-2">
-                <i class="ph-fill ph-crown"></i> จัดการหลังบ้าน (Admin)
+            <button type="button" onclick="toggleDrawerMenu(); toggleAdminModal();" class="w-full btn-princess py-3 px-4 rounded-2xl text-white text-xs font-semibold flex items-center justify-center gap-2">
+                <i class="ph-fill ph-crown text-base"></i> ระบบหลังบ้าน (Admin)
             </button>
         </div>
     </aside>
 
     <!-- ==========================================
-         ป๊อปอัพแสดง % ความคืบหน้าของคิว
+         ป๊อปอัปแสดง % ความคืบหน้างาน
     =========================================== -->
-    <div id="queueDetailModal" onclick="if(event.target === this) closeQueueDetailModal()" class="fixed inset-0 bg-[#4A2545]/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl border-2 border-pink-200/80 space-y-4">
-            <div class="flex items-center justify-between gap-2">
-                <h3 id="queueDetailModalTitle" class="font-cute font-bold text-base text-princess-textDark flex items-center gap-2">
-                    <span class="w-7 h-7 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center">
+    <div id="queueDetailModal" onclick="if(event.target === this) closeQueueDetailModal()" class="fixed inset-0 bg-[#4A2545]/55 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border-2 border-pink-200">
+            <div class="px-5 py-3.5 bg-gradient-to-r from-pink-50 via-white to-purple-50 border-b border-pink-100 flex items-center justify-between gap-2">
+                <h3 id="queueDetailModalTitle" class="font-cute font-bold text-base text-princess-textDark flex items-center gap-2 min-w-0">
+                    <span class="w-7 h-7 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0">
                         <i class="ph-fill ph-sparkle"></i>
                     </span>
-                    รายละเอียดความคืบหน้า
+                    <span class="truncate">รายละเอียดความคืบหน้า</span>
                 </h3>
-                <button type="button" onclick="closeQueueDetailModal()" class="w-8 h-8 rounded-xl bg-pink-50 text-pink-500 hover:bg-pink-100 flex items-center justify-center">
+                <button type="button" onclick="closeQueueDetailModal()" class="w-8 h-8 rounded-full bg-pink-50 text-pink-500 hover:bg-pink-500 hover:text-white flex items-center justify-center transition shrink-0">
                     <i class="ph-bold ph-x"></i>
                 </button>
             </div>
-
-            <div id="queueDetailModalBody">
+            <div id="queueDetailModalBody" class="p-4">
                 <!-- สร้างด้วย JS -->
             </div>
-
-            <button type="button" onclick="closeQueueDetailModal()" class="w-full btn-princess py-2.5 rounded-2xl text-white font-medium text-sm">
-                ปิดหน้าต่าง 🎀
-            </button>
+            <div class="px-4 pb-4">
+                <button type="button" onclick="closeQueueDetailModal()" class="w-full btn-princess py-2.5 rounded-2xl text-white text-xs font-semibold">
+                    ปิดหน้าต่าง 🎀
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- ==========================================
-         ป๊อปอัปรูปภาพความคืบหน้างาน
+         ป๊อปอัปดูรูปภาพความคืบหน้างาน
     =========================================== -->
-    <div id="progressPhotoModal" onclick="if(event.target === this) closeProgressPhotoModal()" class="fixed inset-0 bg-[#4A2545]/60 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-4 sm:p-5 shadow-2xl border-2 border-pink-200 space-y-3 text-center">
-            <div class="flex items-center justify-between">
-                <span id="progressPhotoTitle" class="font-bold text-sm text-princess-textDark flex items-center gap-1.5">
-                    <i class="ph-fill ph-image text-pink-500"></i> รูปอัปเดตความคืบหน้า
-                </span>
-                <button type="button" onclick="closeProgressPhotoModal()" class="w-7 h-7 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center hover:bg-pink-100">
-                    <i class="ph-bold ph-x text-sm"></i>
+    <div id="progressPhotoModal" onclick="if(event.target === this) closeProgressPhotoModal()" class="fixed inset-0 bg-[#4A2545]/65 backdrop-blur-sm z-[65] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full overflow-hidden shadow-2xl border-2 border-pink-200">
+            <div class="px-4 py-3 bg-pink-50/80 border-b border-pink-100 flex items-center justify-between">
+                <h4 id="progressPhotoTitle" class="font-cute font-bold text-sm text-princess-textDark flex items-center gap-1.5">
+                    <i class="ph-fill ph-image text-pink-500"></i> รูปอัปเดตงาน
+                </h4>
+                <button type="button" onclick="closeProgressPhotoModal()" class="w-7 h-7 rounded-full bg-white text-pink-500 flex items-center justify-center">
+                    <i class="ph-bold ph-x text-xs"></i>
                 </button>
             </div>
-            <div class="rounded-2xl overflow-hidden border border-pink-100 bg-princess-bg">
-                <img id="progressPhotoImg" src="" onerror="this.src='https://placehold.co/600x450/FCE7F3/9333EA?text=Yai+Nori+Work+Progress'" alt="รูปความคืบหน้า" class="w-full max-h-72 object-cover">
+            <div class="p-4 space-y-2.5 text-center">
+                <img id="progressPhotoImg" src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg" alt="Work Progress" class="w-full h-60 object-cover rounded-2xl border border-pink-100">
+                <p id="progressPhotoCaption" class="text-xs text-princess-textMuted"></p>
             </div>
-            <p id="progressPhotoCaption" class="text-xs text-princess-textMuted"></p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         แผ่นเสียง CD มุมซ้ายค่อนกลางล่าง + ตัวโน้ตลอยฟุ้ง
+    =========================================== -->
+    <div id="vinylWidget" class="fixed bottom-28 sm:bottom-32 left-3 z-40 select-none">
+        <div id="musicNotesContainer" class="pointer-events-none absolute -top-6 left-0 w-24 h-24 overflow-visible"></div>
+        <button type="button" onclick="toggleMusicPlayer()" aria-label="เปิดหรือปิดเพลง" title="แตะแผ่นเสียงเพื่อเปิด/ปิดเพลง" class="relative w-16 h-16 sm:w-[70px] sm:h-[70px] group focus:outline-none">
+            <!-- แผ่น CD หมุนได้ -->
+            <div id="vinylDisc" class="w-full h-full rounded-full p-1 bg-white shadow-[0_8px_22px_rgba(236,72,153,0.28)] border-2 border-pink-200/90 relative overflow-hidden">
+                <div class="w-full h-full rounded-full p-1 bg-gradient-to-tr from-sky-200 via-purple-200 to-pink-200 relative flex items-center justify-center">
+                    <img id="vinylLogoImg"
+                         src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                         onerror="this.src='https://placehold.co/100x100/FCE7F3/9333EA?text=YN'"
+                         alt="CD Cover"
+                         class="w-full h-full object-cover rounded-full">
+                    <!-- รูเจาะตรงกลางแผ่น CD -->
+                    <div class="w-5 h-5 rounded-full bg-white/95 border-2 border-pink-300 shadow-inner absolute"></div>
+                </div>
+            </div>
+            <!-- ป้ายวงกลมตัวโน้ตมุมขวาล่างตามภาพตัวอย่าง -->
+            <span class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-tr from-pink-100 to-purple-100 border-2 border-white shadow-md flex items-center justify-center text-pink-600">
+                <i id="vinylNoteIcon" class="ph-fill ph-music-note text-sm"></i>
+            </span>
+        </button>
+    </div>
+
+    <!-- ==========================================
+         มาสคอตข้อความอัตโนมัติมุมขวาล่าง (กรอบข้อความอยู่ด้านบน PNG)
+    =========================================== -->
+    <div id="floatingMascotWidget" class="fixed bottom-16 sm:bottom-20 right-3 z-40 pointer-events-none flex flex-col items-end gap-1.5 select-none">
+        <!-- บับเบิลข้อความอัตโนมัติด้านบน -->
+        <div id="mascotAutoBubble"
+             onclick="window.cycleMascotMessageNow(true)"
+             title="แตะเพื่อเปลี่ยนข้อความ"
+             class="pointer-events-auto cursor-pointer max-w-[205px] sm:max-w-[235px] px-4 py-2.5 rounded-2xl rounded-br-sm bg-white/95 backdrop-blur-md border border-pink-200/90 shadow-[0_8px_22px_rgba(236,72,153,0.18)] text-xs sm:text-[13px] font-medium text-princess-textDark leading-snug transition-opacity duration-500">
+            ยินดีต้อนรับสู่ Yai Nori ค่ะ 🎀
+        </div>
+        <!-- รูป PNG มาสคอตโปร่งใสลอยขึ้นลงเบาๆ -->
+        <img id="floatingMascotPng"
+             onclick="window.cycleMascotMessageNow(true)"
+             src="https://i.postimg.cc/pLZ4BnRS/IMG-5175.png"
+             onerror="this.src='https://placehold.co/100x100/FCE7F3/9333EA?text=YN'"
+             alt="Yai Nori Mascot"
+             class="pointer-events-auto cursor-pointer w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_6px_14px_rgba(236,72,153,0.28)] animate-gentle-float">
+    </div>
+
+    <!-- ==========================================
+         ป๊อปอัปสร้างลิงก์และข้อความส่งให้ลูกค้ารายบุคคล (ตกแต่งธีมน่ารัก)
+    =========================================== -->
+    <div id="shareQueueModal" onclick="if(event.target === this) closeShareQueueModal()" class="fixed inset-0 bg-[#4A2545]/60 backdrop-blur-sm z-[65] hidden items-center justify-center p-4">
+        <div class="bg-white/95 backdrop-blur-xl rounded-[2rem] max-w-md w-full overflow-hidden shadow-[0_20px_50px_-12px_rgba(236,72,153,0.35)] border-2 border-pink-200/90">
+            <!-- ส่วนหัวฟอร์มตกแต่งริบบิ้นพาสเทล -->
+            <div class="bg-gradient-to-r from-pink-100/95 via-purple-100/85 to-pink-100/95 px-5 py-4 border-b border-pink-200/70 flex items-center justify-between gap-2 relative overflow-hidden">
+                <div class="flex items-center gap-3 min-w-0 relative z-10">
+                    <div class="relative shrink-0">
+                        <img id="shareModalLogoImg"
+                             src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                             onerror="this.src='https://placehold.co/80x80/FCE7F3/9333EA?text=YN'"
+                             alt="Shop Logo"
+                             class="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm bg-white">
+                        <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-pink-500 text-white text-[9px] flex items-center justify-center border border-white">
+                            <i class="ph-fill ph-heart"></i>
+                        </span>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 class="font-cute font-bold text-base text-princess-textDark flex items-center gap-1.5 truncate">
+                            สร้างลิงก์ส่งลูกค้า 🎀
+                        </h3>
+                        <p class="text-[11px] text-princess-textMuted truncate">การ์ดแจ้งรับคิว & ลิงก์เช็คสถานะงาน</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeShareQueueModal()" class="w-8 h-8 rounded-full bg-white/90 text-pink-500 hover:bg-pink-500 hover:text-white shadow-xs flex items-center justify-center transition shrink-0 relative z-10">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <!-- เนื้อหาภายในการ์ดส่งข้อความ -->
+            <div class="p-5 space-y-4">
+                <!-- แถบข้อมูลลูกค้าและเลขคิว -->
+                <div class="flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-gradient-to-r from-pink-50 via-white to-purple-50 border border-pink-200/80 text-xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-6 h-6 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center shrink-0">
+                            <i class="ph-fill ph-user-circle text-sm"></i>
+                        </span>
+                        <span id="shareCustomerName" class="font-semibold text-princess-textDark truncate">คุณลูกค้า</span>
+                    </div>
+                    <span id="shareQueueBadge" class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-cute font-bold text-[11px] shadow-xs shrink-0">
+                        รหัสคิว YN001
+                    </span>
+                </div>
+
+                <!-- กล่องข้อความตกแต่งสไตล์กระดาษโน้ตลูกคุณหนู -->
+                <div class="space-y-1.5 text-xs">
+                    <div class="flex items-center justify-between px-1">
+                        <span class="font-medium text-princess-textDark flex items-center gap-1">
+                            <i class="ph-fill ph-envelope-open text-pink-500"></i> ข้อความพร้อมส่งให้ลูกค้า:
+                        </span>
+                        <span id="shareShopNameTag" class="text-[11px] font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
+                            ร้าน Yai Nori
+                        </span>
+                    </div>
+                    <div class="p-1.5 rounded-2xl bg-gradient-to-br from-pink-200/60 via-purple-200/50 to-pink-200/60 shadow-inner">
+                        <textarea id="shareQueueMessageBox" rows="6" readonly class="w-full p-3.5 rounded-[0.95rem] bg-white/95 border border-dashed border-pink-300 text-princess-textDark text-xs sm:text-[13px] leading-relaxed focus:outline-none select-all"></textarea>
+                    </div>
+                </div>
+
+                <!-- ปุ่มคัดลอกข้อความและลิงก์ -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                    <button type="button" id="copyShareMsgBtn" onclick="copyShareMessage()" class="btn-princess py-2.5 px-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-1.5">
+                        <i class="ph-fill ph-sparkle"></i> คัดลอกข้อความทั้งหมด
+                    </button>
+                    <button type="button" id="copyShareLinkBtn" onclick="copyShareLinkOnly()" class="py-2.5 px-4 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 text-purple-700 border border-purple-200 font-semibold flex items-center justify-center gap-1.5 transition">
+                        <i class="ph-bold ph-link"></i> คัดลอกเฉพาะลิงก์
+                    </button>
+                </div>
+
+                <!-- ปุ่มทดลองเปิดลิงก์ -->
+                <div class="pt-1 border-t border-pink-100">
+                    <button type="button" id="previewDirectLinkBtn" onclick="" class="w-full py-2.5 px-3 rounded-2xl bg-pink-50/90 hover:bg-pink-100 text-pink-600 border border-pink-200/90 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+                        <i class="ph-fill ph-eye"></i> ทดลองเปิดหน้าเช็คคิวจากลิงก์นี้ ✨
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -684,14 +757,19 @@
                     <!-- ฟอร์มเพิ่ม/แก้ไขคิว -->
                     <form onsubmit="saveQueueForm(event)" class="bg-princess-bg p-4 rounded-2xl border border-pink-200/80 space-y-3 text-xs">
                         <input type="hidden" id="editQueueIndex" value="-1">
-                        <h4 class="font-bold text-sm text-pink-600 flex items-center gap-1.5">
-                            <i class="ph-fill ph-plus-circle"></i> เพิ่มคิวงานใหม่ / แก้ไขคิว
-                        </h4>
+                        <div class="flex items-center justify-between gap-2 flex-wrap">
+                            <h4 class="font-bold text-sm text-pink-600 flex items-center gap-1.5">
+                                <i class="ph-fill ph-plus-circle"></i> เพิ่มคิวงานใหม่ / แก้ไขคิว
+                            </h4>
+                            <span id="shopPrefixHintBadge" class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-white text-purple-600 border border-purple-200/80">
+                                อักษรย่อคิวตามชื่อร้าน: YN
+                            </span>
+                        </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block text-princess-textMuted font-medium mb-1">เลขคิว *</label>
-                                <input type="text" id="formQueueCode" required placeholder="เช่น A124, B046" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                                <label class="block text-princess-textMuted font-medium mb-1">เลขคิว * <span class="text-[10px] text-pink-500">(ยึดชื่อย่อร้านอัตโนมัติ)</span></label>
+                                <input type="text" id="formQueueCode" required placeholder="เช่น YN006 (พิมพ์แค่ตัวเลขได้)" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
                             </div>
                             <div>
                                 <label class="block text-princess-textMuted font-medium mb-1">ชื่อลูกค้า / เบอร์โทร *</label>
@@ -774,6 +852,10 @@
                                 <input type="text" id="settingShopName" value="Yai Nori" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
                             </div>
                             <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">ชื่อแอคเคาท์ร้าน (@Handle สำหรับข้อความแจ้งคิว)</label>
+                                <input type="text" id="settingShopHandle" value="@yainori" placeholder="เช่น @yainori" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div class="sm:col-span-2">
                                 <label class="block font-medium text-princess-textMuted mb-1">คำอธิบายใต้ชื่อร้าน</label>
                                 <input type="text" id="settingShopSub" value="สตูดิโอรับทำผลงาน & เช็คสถานะคิวออนไลน์ ✨" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
                             </div>
@@ -784,6 +866,10 @@
                             <div>
                                 <label class="block font-medium text-princess-textMuted mb-1">ลิงก์รูปแบนเนอร์ (รองรับ JPG / PNG / GIF)</label>
                                 <input type="text" id="settingBannerUrl" value="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block font-medium text-princess-textMuted mb-1">ลิงก์เว็บไซต์หลักสำหรับสร้างลิงก์เช็คคิว (เว้นว่างไว้จะใช้ลิงก์หน้าเว็บปัจจุบันอัตโนมัติ)</label>
+                                <input type="text" id="settingBaseUrl" value="" placeholder="เช่น https://yainori.vercel.app/queue" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
                             </div>
                         </div>
 
@@ -874,12 +960,63 @@
     =========================================== -->
     <script>
         // 1. ค่าตั้งต้นของรูปภาพและข้อมูลร้าน
+        let currentShopName = "Yai Nori";
         let bannerImageUrl = "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg";
         let shopLogoUrl = "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg";
         let runnerPngUrl = "https://i.postimg.cc/pLZ4BnRS/IMG-5175.png";
         let chatLeftPngUrl = "https://i.postimg.cc/rp2s53Fq/mi-m-ch-x-55-20261115005344.png";
         let chatRightPngUrl = "https://i.postimg.cc/3Rnw5wX6/mi-m-ch-x-37-20261027142435.png";
         let mascotWidgetPngUrl = "https://i.postimg.cc/pLZ4BnRS/IMG-5175.png";
+        let shopHandle = "@yainori";
+        let customBaseUrl = "";
+        let activeShareLink = "";
+
+        // สร้างอักษรย่อร้านสำหรับใช้เป็นตัวอักษรนำหน้าเลขคิว (เช่น Yai Nori -> YN)
+        function getShopAbbreviation(name) {
+            const clean = (name || currentShopName || 'Yai Nori').trim();
+            if (!clean) return 'YN';
+
+            const engWords = clean.match(/[A-Za-z]+/g);
+            if (engWords && engWords.length > 0) {
+                if (engWords.length >= 2) {
+                    return (engWords[0][0] + engWords[1][0]).toUpperCase();
+                }
+                return engWords[0].slice(0, 2).toUpperCase();
+            }
+
+            const thaiConsonants = clean.match(/[ก-ฮ]/g);
+            if (thaiConsonants && thaiConsonants.length >= 2) {
+                return thaiConsonants[0] + thaiConsonants[1];
+            }
+            if (thaiConsonants && thaiConsonants.length === 1) {
+                return thaiConsonants[0];
+            }
+
+            return 'YN';
+        }
+
+        // จัดรูปแบบเลขคิวให้ขึ้นต้นด้วยชื่อย่อร้าน (เช่น พิมพ์ 006 -> YN006)
+        function formatQueueCodeWithShopPrefix(rawCode) {
+            const trimmed = (rawCode || '').trim().toUpperCase();
+            if (!trimmed) return '';
+            const prefix = getShopAbbreviation(currentShopName);
+            if (/^\d+$/.test(trimmed)) {
+                return `${prefix}${trimmed}`;
+            }
+            return trimmed;
+        }
+
+        function updateShopPrefixHints() {
+            const prefix = getShopAbbreviation(currentShopName);
+            const badge = document.getElementById('shopPrefixHintBadge');
+            const codeInput = document.getElementById('formQueueCode');
+            if (badge) {
+                badge.textContent = `อักษรย่อคิวตามชื่อร้าน: ${prefix}`;
+            }
+            if (codeInput) {
+                codeInput.placeholder = `เช่น ${prefix}006 (พิมพ์แค่ตัวเลขได้)`;
+            }
+        }
 
         // ข้อมูลช่องทางติดต่อ
         const contactInfo = {
@@ -896,10 +1033,10 @@
             { id: 3, name: "เสร็จสิ้น", defaultPercent: 100 }
         ];
 
-        // 3. ข้อมูลคิวตัวอย่าง (Demo)
+        // 3. ข้อมูลคิวตัวอย่าง (Demo - เลขคิวยึดตามชื่อย่อร้าน Yai Nori -> YN)
         let queuesData = [
             {
-                code: "A123",
+                code: "YN001",
                 customer: "คุณหนูโรส (081-234-5678)",
                 service: "งานสั่งทำพิเศษ เซ็ตโบว์ชมพูพาสเทล",
                 statusText: "กำลังให้บริการ",
@@ -909,7 +1046,7 @@
                 progressImage: "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
             },
             {
-                code: "B042",
+                code: "YN002",
                 customer: "คุณลิลลี่ (086-111-2233)",
                 service: "กรอบรูปเรซิ่นกากเพชรลาเวนเดอร์",
                 statusText: "รอคิว",
@@ -919,7 +1056,7 @@
                 progressImage: "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
             },
             {
-                code: "B043",
+                code: "YN003",
                 customer: "คุณเอวา (082-333-4455)",
                 service: "เคสตกแต่งอะไหล่เพชรพาสเทล",
                 statusText: "รอคิว",
@@ -929,7 +1066,7 @@
                 progressImage: ""
             },
             {
-                code: "B045",
+                code: "YN004",
                 customer: "คุณมิลิน (089-876-5432)",
                 service: "คิวงานออกแบบและตกแต่งคอลเลกชันพาสเทล",
                 statusText: "รอคิว",
@@ -939,7 +1076,7 @@
                 progressImage: ""
             },
             {
-                code: "C089",
+                code: "YN005",
                 customer: "คุณแพรวา (090-555-7890)",
                 service: "พวงกุญแจลูกปัดคริสตัลชมพู",
                 statusText: "เสร็จสิ้น",
@@ -1081,31 +1218,49 @@
                         <img src="${escapeHtml(avatarUrl)}"
                              onerror="this.src='https://placehold.co/60x60/FCE7F3/9333EA?text=YN'"
                              alt="Queue Avatar PNG"
-                             class="w-10 h-10 object-contain drop-shadow-sm shrink-0 group-hover:scale-105 transition">
-                        <div class="${bubbleCornerClass} border px-3.5 py-2 ${bubbleStyle}">
-                            <div class="flex flex-wrap items-center gap-1.5 text-xs">
-                                <span class="font-bold font-cute ${isMine ? 'text-pink-600' : 'text-purple-700'}">${escapeHtml(item.code)}</span>
+                             class="w-9 h-9 sm:w-10 sm:h-10 object-contain shrink-0 drop-shadow-[0_2px_6px_rgba(236,72,153,0.25)]">
+                        <div class="${bubbleCornerClass} border px-3.5 py-2.5 ${bubbleStyle} group-hover:scale-[1.01]">
+                            <div class="flex items-center flex-wrap gap-1.5 text-xs">
+                                <span class="font-cute font-bold text-pink-600">${escapeHtml(item.code)}</span>
+                                ${isMine ? `<span class="px-2 py-0.5 rounded-full bg-pink-500 text-white text-[10px] font-semibold">คิวของคุณ</span>` : ''}
                                 <span class="text-princess-textMuted">·</span>
-                                <span class="font-medium text-princess-textDark">${escapeHtml(item.customer)}</span>
-                                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${isMine ? 'bg-pink-500 text-white' : 'bg-white/90 text-purple-600 border border-purple-100'}">
-                                    ${isMine ? 'คิวของคุณ' : shortStatus}
-                                </span>
+                                <span class="font-semibold text-purple-600">${shortStatus}</span>
                             </div>
-                            <div class="text-[11px] text-princess-textMuted mt-0.5 flex items-center gap-1">
-                                <i class="ph-fill ph-sparkle text-pink-400 text-[10px] shrink-0"></i>
-                                <span class="truncate">${escapeHtml(item.service || 'รายการทั่วไป')}</span>
+                            <div class="text-xs font-medium text-princess-textDark mt-0.5">
+                                ${escapeHtml(item.customer)}
                             </div>
+                            ${item.service ? `<div class="text-[11px] text-princess-textMuted mt-0.5">${escapeHtml(item.service)}</div>` : ''}
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
+        // อัปเดตปุ่มคิวตัวอย่างใต้ช่องค้นหา
+        function renderSampleQueueButtons() {
+            const container = document.getElementById('sampleQueueButtons');
+            if (!container) return;
+            const samples = queuesData.slice(0, 3);
+            if (samples.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+            container.classList.remove('hidden');
+            container.innerHTML = `<span>ตัวอย่าง:</span>` + samples.map((q, idx) => {
+                const colorCls = idx === 0
+                    ? 'bg-pink-50 hover:bg-pink-100 text-pink-600 border-pink-200/70'
+                    : 'bg-purple-50 hover:bg-purple-100 text-purple-600 border-purple-200/70';
+                return `<button type="button" onclick="quickFillSearch('${escapeHtml(q.code)}')" class="px-2.5 py-0.5 rounded-full ${colorCls} border font-medium transition">${escapeHtml(q.code)}</button>`;
+            }).join('');
+        }
+
         // อัปเดตทุกส่วนบนหน้าเว็บพร้อมกัน
         function refreshAllViews() {
             renderBanner();
+            renderSampleQueueButtons();
             renderActiveMascot();
             renderWaitingChatBubbles();
+            updateShopPrefixHints();
         }
 
         // ปุ่มเติมเลขคิวตัวอย่างลงช่องค้นหาแล้วค้นหาทันที
@@ -1615,6 +1770,185 @@
         }
 
         // ==========================================
+        // ระบบสร้างลิงก์เช็คคิวรายบุคคล & เปิดลิงก์ตรง (?code=XXX)
+        // ==========================================
+        function getDirectQueueLink(code) {
+            const encodedCode = encodeURIComponent(code.trim());
+            if (customBaseUrl && customBaseUrl.trim()) {
+                const cleanBase = customBaseUrl.trim().replace(/\/+$/, '');
+                const separator = cleanBase.includes('?') ? '&' : '?';
+                return `${cleanBase}${separator}code=${encodedCode}`;
+            }
+
+            try {
+                const loc = window.location;
+                if (loc && (loc.protocol === 'http:' || loc.protocol === 'https:') && loc.hostname && !loc.href.includes('srcdoc')) {
+                    const urlObj = new URL(loc.href);
+                    urlObj.searchParams.set('code', code.trim());
+                    return urlObj.toString();
+                }
+            } catch (err) {
+                // กรณีรันในโหมดพรีวิว Sandbox ใช้ลิงก์ตัวอย่างที่พร้อมใช้งาน
+            }
+            return `https://yainori-queue.vercel.app/queue?code=${encodedCode}`;
+        }
+
+        function formatCustomerGreeting(customerStr) {
+            const raw = (customerStr || '').trim();
+            // ตัดเบอร์โทรในวงเล็บท้ายชื่อออกเพื่อให้ข้อความทักทายดูน่ารักเป็นธรรมชาติ
+            const cleanName = raw.replace(/\s*\([^)]*\)\s*$/, '').trim() || raw;
+            if (cleanName.startsWith('คุณ')) {
+                return `สวัสดี${cleanName}`;
+            }
+            return `สวัสดีคุณ ${cleanName}`;
+        }
+
+        function buildShareQueueMessage(item) {
+            const greeting = formatCustomerGreeting(item.customer);
+            const shopTitle = (currentShopName || 'Yai Nori').trim();
+            const link = getDirectQueueLink(item.code);
+
+            return `${greeting} 🎀\n${shopTitle} ลงคิวงานให้เรียบร้อยค่ะ ✨\nรหัสติดตามงาน: ${item.code}\nเช็คสถานะงานได้ตลอดที่ ${link}\nลูกค้าสามารถกดลิงก์เช็คคิวความคืบหน้าของงานได้โดยตรงเลยนะคะ 💖`;
+        }
+
+        function openShareQueueModal(idx) {
+            const item = queuesData[idx];
+            if (!item) return;
+            openShareQueueModalByItem(item);
+        }
+
+        function openShareQueueModalByCode(code) {
+            const item = queuesData.find(q => q.code.toUpperCase() === code.toUpperCase());
+            if (!item) return;
+            openShareQueueModalByItem(item);
+        }
+
+        function openShareQueueModalByItem(item) {
+            const modal = document.getElementById('shareQueueModal');
+            const msgBox = document.getElementById('shareQueueMessageBox');
+            const badge = document.getElementById('shareQueueBadge');
+            const customerNameEl = document.getElementById('shareCustomerName');
+            const shopTagEl = document.getElementById('shareShopNameTag');
+            const logoImgEl = document.getElementById('shareModalLogoImg');
+            const previewBtn = document.getElementById('previewDirectLinkBtn');
+            if (!modal || !msgBox) return;
+
+            activeShareLink = getDirectQueueLink(item.code);
+            msgBox.value = buildShareQueueMessage(item);
+            if (badge) badge.textContent = `รหัสคิว ${item.code}`;
+            if (customerNameEl) customerNameEl.textContent = item.customer || 'คุณลูกค้า';
+            if (shopTagEl) shopTagEl.textContent = `ร้าน ${currentShopName || 'Yai Nori'}`;
+            if (logoImgEl) logoImgEl.src = shopLogoUrl;
+            if (previewBtn) {
+                previewBtn.setAttribute('onclick', `previewCustomerDirectLink('${escapeHtml(item.code)}')`);
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeShareQueueModal() {
+            const modal = document.getElementById('shareQueueModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function copyTextSilently(text) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+        }
+
+        function copyShareMessage() {
+            const msgBox = document.getElementById('shareQueueMessageBox');
+            const btn = document.getElementById('copyShareMsgBtn');
+            if (!msgBox) return;
+
+            try {
+                copyTextSilently(msgBox.value);
+                if (btn) {
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = `<i class="ph-bold ph-check"></i> คัดลอกข้อความแล้ว ✨`;
+                    setTimeout(() => { btn.innerHTML = originalHtml; }, 1800);
+                }
+            } catch (err) {
+                showDialog('คัดลอกข้อความ', 'กรุณากดค้างที่ช่องข้อความเพื่อคัดลอกนะคะ');
+            }
+        }
+
+        function copyShareLinkOnly() {
+            const btn = document.getElementById('copyShareLinkBtn');
+            if (!activeShareLink) return;
+
+            try {
+                copyTextSilently(activeShareLink);
+                if (btn) {
+                    const originalHtml = btn.innerHTML;
+                    btn.innerHTML = `<i class="ph-bold ph-check"></i> คัดลอกลิงก์แล้ว 🔗`;
+                    setTimeout(() => { btn.innerHTML = originalHtml; }, 1800);
+                }
+            } catch (err) {
+                showDialog('ลิงก์ติดตามงาน', activeShareLink);
+            }
+        }
+
+        // จำลองการเปิดลิงก์ในมุมมองลูกค้าทันที
+        function previewCustomerDirectLink(code) {
+            closeShareQueueModal();
+            const adminModal = document.getElementById('adminModal');
+            const banner = document.getElementById('adminBanner');
+            if (adminModal && !adminModal.classList.contains('hidden')) {
+                adminModal.classList.add('hidden');
+                adminModal.classList.remove('flex');
+            }
+            if (banner) banner.classList.add('hidden');
+
+            // อัปเดต URL query parameter บนเบราว์เซอร์ (ถ้าสภาพแวดล้อมรองรับ)
+            try {
+                if (window.history && window.history.replaceState && window.location.protocol.startsWith('http')) {
+                    const nextUrl = new URL(window.location.href);
+                    nextUrl.searchParams.set('code', code);
+                    window.history.replaceState({}, '', nextUrl.toString());
+                }
+            } catch (err) {}
+
+            quickFillSearch(code);
+            openQueueDetailByCode(code);
+        }
+
+        // ตรวจสอบพารามิเตอร์ ?code=XXX เมื่อลูกค้าเปิดผ่านลิงก์ตรง
+        function checkIncomingQueueUrlParam() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                let incomingCode = params.get('code');
+
+                // รองรับกรณีส่งผ่าน hash เช่น #code=VE2618
+                if (!incomingCode && window.location.hash && window.location.hash.includes('code=')) {
+                    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+                    incomingCode = hashParams.get('code');
+                }
+
+                if (incomingCode && incomingCode.trim()) {
+                    const cleanCode = incomingCode.trim();
+                    const input = document.getElementById('queueSearchInput');
+                    if (input) input.value = cleanCode;
+                    handleSearchQueue();
+
+                    // เปิดป๊อปอัพแสดงความคืบหน้าของคิวนั้นอัตโนมัติหลังหน้าโหลดเสร็จ
+                    setTimeout(() => {
+                        openQueueDetailByCode(cleanCode);
+                    }, 1850);
+                }
+            } catch (err) {}
+        }
+
+        // ==========================================
         // เอฟเฟกต์แตะหน้าจอทุกจุดแบบฟุ้งละมุน (ไม่ใช้อิโมจิ)
         // ==========================================
         function initTouchSparkles() {
@@ -2010,6 +2344,9 @@
                                 <div class="text-[11px] text-princess-textMuted truncate mt-0.5">${escapeHtml(item.service || '-')}</div>
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
+                                <button type="button" onclick="openShareQueueModal(${idx})" class="px-2.5 py-1 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200/80 font-medium flex items-center gap-1">
+                                    <i class="ph-bold ph-link"></i> ส่งลิงก์
+                                </button>
                                 <button type="button" onclick="editQueueItem(${idx})" class="px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-600 font-medium">แก้ไข</button>
                                 <button type="button" onclick="confirmDeleteQueue(${idx})" class="px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 font-medium">ลบ</button>
                             </div>
@@ -2038,7 +2375,8 @@
         function saveQueueForm(event) {
             if (event) event.preventDefault();
             const editIdx = parseInt(document.getElementById('editQueueIndex')?.value ?? '-1', 10);
-            const code = (document.getElementById('formQueueCode')?.value || '').trim().toUpperCase();
+            const rawCode = document.getElementById('formQueueCode')?.value || '';
+            const code = formatQueueCodeWithShopPrefix(rawCode);
             const customer = (document.getElementById('formCustomer')?.value || '').trim();
             const service = (document.getElementById('formService')?.value || '').trim();
             const step = parseInt(document.getElementById('formStep')?.value || String(progressStages[0]?.id ?? 1), 10);
@@ -2054,13 +2392,21 @@
             }
 
             const payload = { code, customer, service, statusText, subStatus, step, percent, progressImage };
+            const shareBtnHtml = `
+                <button type="button" onclick="closeDialog(); openShareQueueModalByCode('${escapeHtml(code)}');" class="btn-princess px-4 py-2 rounded-2xl text-white text-xs font-semibold flex items-center gap-1">
+                    <i class="ph-bold ph-paper-plane-tilt"></i> สร้างลิงก์ส่งลูกค้า
+                </button>
+                <button type="button" onclick="closeDialog()" class="px-4 py-2 rounded-2xl bg-pink-50 border border-pink-200 text-pink-600 text-xs font-semibold">
+                    ตกลง
+                </button>
+            `;
 
             if (editIdx >= 0 && editIdx < queuesData.length) {
                 queuesData[editIdx] = payload;
-                showDialog('บันทึกการแก้ไขแล้ว ✨', `อัปเดตข้อมูลคิว ${code} เรียบร้อยค่ะ`);
+                showDialog('บันทึกการแก้ไขแล้ว ✨', `อัปเดตข้อมูลคิว ${code} เรียบร้อยค่ะ`, shareBtnHtml);
             } else {
                 queuesData.push(payload);
-                showDialog('เพิ่มคิวใหม่สำเร็จ ✨', `เพิ่มคิว ${code} เข้าสู่ระบบเรียบร้อยค่ะ`);
+                showDialog('เพิ่มคิวใหม่สำเร็จ ✨', `เพิ่มคิว ${code} เข้าสู่ระบบเรียบร้อยค่ะ กดสร้างลิงก์ส่งให้ลูกค้าได้เลยน้า`, shareBtnHtml);
             }
 
             resetQueueForm();
@@ -2130,9 +2476,11 @@
                 if (el) el.value = val;
             };
             setVal('settingShopName', document.getElementById('displayShopName')?.textContent.trim() || 'Yai Nori');
+            setVal('settingShopHandle', shopHandle);
             setVal('settingShopSub', document.getElementById('displayShopSub')?.textContent.trim() || '');
             setVal('settingLogoUrl', shopLogoUrl);
             setVal('settingBannerUrl', bannerImageUrl);
+            setVal('settingBaseUrl', customBaseUrl);
             setVal('settingRunnerPngUrl', runnerPngUrl);
             setVal('settingChatLeftPngUrl', chatLeftPngUrl);
             setVal('settingChatRightPngUrl', chatRightPngUrl);
@@ -2145,15 +2493,33 @@
 
         // บันทึกการตั้งค่ารูปภาพและข้อมูลเว็บไซต์
         function saveSiteSettings() {
+            const oldPrefix = getShopAbbreviation(currentShopName);
             const shopName = (document.getElementById('settingShopName')?.value || '').trim() || 'Yai Nori';
+            const newHandle = (document.getElementById('settingShopHandle')?.value || '').trim();
             const shopSub = (document.getElementById('settingShopSub')?.value || '').trim();
             const newLogo = (document.getElementById('settingLogoUrl')?.value || '').trim();
             const newBanner = (document.getElementById('settingBannerUrl')?.value || '').trim();
+            const newBaseUrl = (document.getElementById('settingBaseUrl')?.value || '').trim();
             const newRunner = (document.getElementById('settingRunnerPngUrl')?.value || '').trim();
             const newChatLeft = (document.getElementById('settingChatLeftPngUrl')?.value || '').trim();
             const newChatRight = (document.getElementById('settingChatRightPngUrl')?.value || '').trim();
             const newMascotFloat = (document.getElementById('settingMascotFloatUrl')?.value || '').trim();
             const rawMessages = document.getElementById('settingMascotMessages')?.value || '';
+
+            currentShopName = shopName;
+            const newPrefix = getShopAbbreviation(currentShopName);
+            if (oldPrefix && newPrefix && oldPrefix !== newPrefix) {
+                queuesData.forEach(q => {
+                    if (q.code.toUpperCase().startsWith(oldPrefix)) {
+                        q.code = newPrefix + q.code.slice(oldPrefix.length);
+                    }
+                });
+            }
+
+            if (newHandle) {
+                shopHandle = newHandle.startsWith('@') ? newHandle : `@${newHandle}`;
+            }
+            customBaseUrl = newBaseUrl;
 
             const displayShopName = document.getElementById('displayShopName');
             const loaderShopName = document.getElementById('loaderShopName');
@@ -2164,7 +2530,7 @@
 
             if (newLogo) {
                 shopLogoUrl = newLogo;
-                ['headerLogo', 'drawerLogo', 'mascotAvatarImg', 'vinylLogoImg', 'loaderLogoImg'].forEach(id => {
+                ['headerLogo', 'drawerLogo', 'mascotAvatarImg', 'vinylLogoImg', 'loaderLogoImg', 'shareModalLogoImg'].forEach(id => {
                     const img = document.getElementById(id);
                     if (img) img.src = shopLogoUrl;
                 });
@@ -2205,6 +2571,7 @@
             window.startMascotAutoMessages();
             initTouchSparkles();
             initAutoMusicPlay();
+            checkIncomingQueueUrlParam();
         });
     </script>
 </body>
