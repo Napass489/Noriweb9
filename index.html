@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yai Nori - เช็คคิว & ติดตามความคืบหน้า</title>
+
+    <!-- Google Fonts: Mali (น่ารักละมุนสำหรับหัวข้อ/เลขคิว) & Kanit (อ่านง่ายสำหรับเนื้อหา) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Mali:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Kanit', 'sans-serif'],
+                        cute: ['Mali', 'cursive', 'sans-serif'],
+                    },
+                    colors: {
+                        princess: {
+                            bg: '#FFF8FB',
+                            pinkLight: '#FCE7F3',
+                            pink: '#F9A8D4',
+                            pinkDeep: '#EC4899',
+                            purpleLight: '#F3E8FF',
+                            purple: '#D8B4FE',
+                            purpleDeep: '#A855F7',
+                            textDark: '#4A2545',
+                            textMuted: '#8B6B88',
+                        }
+                    },
+                    boxShadow: {
+                        'princess': '0 10px 30px -8px rgba(236, 72, 153, 0.16), 0 4px 12px -4px rgba(168, 85, 247, 0.10)',
+                        'princess-sm': '0 4px 14px -3px rgba(236, 72, 153, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #FFF8FB;
+            background-image:
+                radial-gradient(circle at 12% 10%, rgba(252, 231, 243, 0.9) 0%, transparent 42%),
+                radial-gradient(circle at 88% 18%, rgba(243, 232, 255, 0.85) 0%, transparent 45%),
+                radial-gradient(circle at 50% 85%, rgba(252, 231, 243, 0.7) 0%, transparent 50%);
+            color: #4A2545;
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(249, 168, 212, 0.35);
+        }
+
+        .ribbon-badge {
+            background: linear-gradient(135deg, #FCE7F3 0%, #F3E8FF 100%);
+            border: 1px solid rgba(244, 114, 182, 0.35);
+        }
+
+        .btn-princess {
+            background: linear-gradient(135deg, #F472B6 0%, #C084FC 100%);
+            box-shadow: 0 6px 16px -4px rgba(236, 72, 153, 0.42);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+        }
+        .btn-princess:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px -4px rgba(236, 72, 153, 0.5);
+        }
+        .btn-princess:active {
+            transform: scale(0.98);
+        }
+
+        /* แชทบับเบิลมีหางชิดซ้ายและขวา */
+        .chat-queue-bubble {
+            position: relative;
+            border-radius: 1.15rem 1.15rem 1.15rem 0.35rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+        .chat-queue-bubble-right {
+            position: relative;
+            border-radius: 1.15rem 1.15rem 0.35rem 1.15rem;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        @keyframes bubblePulseOnce {
+            0% { transform: scale(1); }
+            45% { transform: scale(1.06); }
+            100% { transform: scale(1); }
+        }
+        .bubble-pulse-once {
+            animation: bubblePulseOnce 0.65s ease-out 1;
+        }
+
+        /* ลูกเล่นลอยขึ้นลงเบาๆ สำหรับรูป PNG มาสคอตและรูปเหนือแถบความคืบหน้า */
+        @keyframes gentleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-gentle-float {
+            animation: gentleFloat 3s ease-in-out infinite;
+        }
+
+        /* แผ่นเสียง CD หมุน */
+        @keyframes spinVinyl {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .vinyl-spinning {
+            animation: spinVinyl 6s linear infinite;
+        }
+
+        /* ตัวโน้ตลอยฟุ้งจากแผ่นเสียง */
+        @keyframes floatNote {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0.6) rotate(-10deg);
+            }
+            20% {
+                opacity: 0.95;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--nx, 14px), -48px) scale(1.15) rotate(16deg);
+            }
+        }
+        .music-note-float {
+            position: absolute;
+            pointer-events: none;
+            animation: floatNote 2.1s ease-out forwards;
+            color: #EC4899;
+            text-shadow: 0 2px 8px rgba(244, 114, 182, 0.45);
+        }
+
+        /* เอฟเฟกต์แตะหน้าจอแบบฟุ้งละมุน (Soft Bokeh Glow & Starlight) */
+        @keyframes softGlowBurst {
+            0% {
+                opacity: 0.85;
+                transform: translate(-50%, -50%) scale(0.25);
+            }
+            60% {
+                opacity: 0.45;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.85);
+            }
+        }
+        @keyframes softParticleDrift {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            25% {
+                opacity: 0.95;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.15) rotate(var(--rot));
+            }
+        }
+        .touch-glow-ring {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(249, 168, 212, 0.55) 42%, rgba(216, 180, 254, 0.25) 70%, transparent 100%);
+            filter: blur(4px);
+            animation: softGlowBurst 0.85s ease-out forwards;
+        }
+        .touch-bokeh-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            animation: softParticleDrift var(--dur, 0.9s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* ซ่อนสโครลบาร์บางจุดให้ดูสะอาด */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* แอนิเมชันสำหรับหน้าโหลดเข้าเว็บ (Loading Screen) */
+        @keyframes loaderHaloSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes loaderTwinkle {
+            0%, 100% { opacity: 0.35; transform: scale(0.8) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.18) rotate(18deg); }
+        }
+        @keyframes loaderOrbDrift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(8px, -12px) scale(1.06); }
+        }
+        .loader-halo-spin {
+            animation: loaderHaloSpin 10s linear infinite;
+        }
+        .loader-twinkle {
+            animation: loaderTwinkle 2s ease-in-out infinite;
+        }
+        .loader-orb {
+            animation: loaderOrbDrift 4.5s ease-in-out infinite;
+        }
+        #pageLoader {
+            transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        #pageLoader.loader-fade-out {
+            opacity: 0;
+            transform: scale(1.03);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased selection:bg-pink-200 selection:text-pink-900">
+
+    <!-- ==========================================
+         หน้าโหลดเข้าเว็บน่ารักๆ เข้าธีม Yai Nori (Loading Screen)
+    =========================================== -->
+    <div id="pageLoader" class="fixed inset-0 z-[100] flex flex-col items-center justify-center px-6 overflow-hidden select-none"
+         style="background: radial-gradient(circle at 20% 18%, #FCE7F3 0%, #FFF8FB 48%, #F3E8FF 100%);">
+        <!-- ละอองฟองพาสเทลพื้นหลังลอยละมุน -->
+        <div class="pointer-events-none absolute inset-0 overflow-hidden">
+            <div class="loader-orb absolute top-16 left-8 w-28 h-28 rounded-full bg-pink-200/45 blur-2xl"></div>
+            <div class="loader-orb absolute bottom-20 right-8 w-36 h-36 rounded-full bg-purple-200/45 blur-2xl" style="animation-delay: 1.2s;"></div>
+            <div class="loader-orb absolute top-1/3 right-1/4 w-20 h-20 rounded-full bg-white/70 blur-xl" style="animation-delay: 0.6s;"></div>
+        </div>
+
+        <!-- การ์ดเนื้อหาหน้าโหลด -->
+        <div class="relative z-10 flex flex-col items-center text-center max-w-xs w-full space-y-5">
+            <!-- โลโก้ร้านพร้อมวงแหวนหมุนและประกายดาว -->
+            <div class="relative flex items-center justify-center">
+                <!-- วงแหวนประพาสเทลหมุนวน -->
+                <div class="loader-halo-spin w-32 h-32 rounded-full border-2 border-dashed border-pink-300/80 absolute"></div>
+                <div class="w-28 h-28 rounded-full bg-gradient-to-tr from-pink-300/40 via-white to-purple-300/40 blur-md absolute"></div>
+
+                <!-- ประกายดาว 4 แฉกวิบวับรอบโลโก้ -->
+                <svg class="loader-twinkle absolute -top-2 -left-2 w-5 h-5 text-pink-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0L14.8 9.2L24 12L14.8 14.8L12 24L9.2 14.8L0 12L9.2 9.2Z"/>
+                </svg>
+                <svg class="loader-twinkle absolute -bottom-1 -right-3 w-4 h-4 text-purple-400" style="animation-delay: 0.8s;" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0L14.8 9.2L24 12L14.8 14.8L12 24L9.2 14.8L0 12L9.2 9.2Z"/>
+                </svg>
+
+                <!-- รูปโลโก้ร้าน -->
+                <div class="relative w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-pink-400 via-purple-300 to-pink-300 shadow-[0_10px_28px_rgba(236,72,153,0.28)] animate-gentle-float">
+                    <img id="loaderLogoImg"
+                         src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                         onerror="this.src='https://placehold.co/160x160/FCE7F3/9333EA?text=YN'"
+                         alt="Yai Nori Logo"
+                         class="w-full h-full object-cover rounded-full bg-white">
+                    <span class="absolute -top-2 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full bg-white text-pink-500 border border-pink-200 shadow-sm flex items-center justify-center text-sm">
+                        <i class="ph-fill ph-crown"></i>
+                    </span>
+                </div>
+            </div>
+
+            <!-- ชื่อร้านและป้าย Official -->
+            <div class="space-y-1">
+                <div class="inline-flex items-center gap-1.5">
+                    <h2 id="loaderShopName" class="font-cute font-bold text-2xl text-princess-textDark tracking-wide">
+                        Yai Nori
+                    </h2>
+                    <span class="ribbon-badge text-[10px] font-semibold px-2 py-0.5 rounded-full text-pink-600">
+                        Official
+                    </span>
+                </div>
+                <p id="loaderStatusText" class="text-xs text-princess-textMuted">
+                    กำลังเตรียมความน่ารักให้คุณหนู... ✨
+                </p>
+            </div>
+
+            <!-- แถบโหลดพาสเทลพร้อมมาสคอต PNG ลอยตามเปอร์เซ็นต์ -->
+            <div class="w-full pt-8 relative">
+                <div id="loaderMascotRunner" style="left: 8%;" class="absolute top-0 -translate-x-1/2 transition-all duration-150 pointer-events-none">
+                    <img src="https://i.postimg.cc/pLZ4BnRS/IMG-5175.png"
+                         onerror="this.src='https://placehold.co/60x60/FCE7F3/9333EA?text=YN'"
+                         alt="Loading Mascot"
+                         class="w-10 h-10 object-contain drop-shadow-[0_3px_8px_rgba(244,114,182,0.38)] animate-gentle-float">
+                </div>
+                <div class="w-full h-3 rounded-full bg-white/90 border border-pink-200/90 p-0.5 shadow-inner overflow-hidden">
+                    <div id="loaderProgressBar" style="width: 0%;" class="h-full rounded-full bg-gradient-to-r from-pink-400 via-purple-400 to-pink-500 transition-all duration-150"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-princess-textMuted mt-2 px-1">
+                    <span class="flex items-center gap-1 text-pink-500/90">
+                        <i class="ph-fill ph-music-notes"></i> แตะหน้าจอเปิดเพลงได้นะคะ
+                    </span>
+                    <span id="loaderPercentText" class="font-cute font-bold text-pink-600">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- แถบแจ้งเตือนโหมดแอดมิน (แสดงเฉพาะเมื่อเปิดระบบหลังบ้าน) -->
+    <div id="adminBanner" class="hidden sticky top-0 z-50 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 text-white text-center text-xs py-1.5 px-3 shadow-sm">
+        <i class="ph-fill ph-crown mr-1"></i> กำลังใช้งานโหมดจัดการหลังบ้าน (Demo) — ข้อมูลจะอัปเดตทันทีบนหน้าเว็บนี้
+    </div>
+
+    <!-- ==========================================
+         คอนเทนเนอร์หลักของหน้าเว็บ (เรียงลำดับตามแบบร่าง)
+    =========================================== -->
+    <main class="max-w-lg mx-auto px-4 pt-4 pb-16 space-y-5 relative z-10">
+
+        <!-- ==========================================
+             ส่วนที่ 1: ส่วนหัวโลโก้ (ด้านบนสุด)
+             แตะโลโก้เพื่อเปิดระบบหลังบ้าน (Admin)
+        =========================================== -->
+        <header id="topSection" class="glass-card rounded-3xl px-4 py-3 shadow-princess flex items-center justify-between gap-3">
+            <!-- ฝั่งซ้าย: โลโก้ + ชื่อร้าน + Official + คำอธิบาย -->
+            <div class="flex items-center gap-3 min-w-0">
+                <button type="button" onclick="toggleAdminModal()" title="แตะโลโก้เพื่อเข้าระบบหลังบ้าน (Admin)" class="relative shrink-0 group focus:outline-none">
+                    <div class="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-pink-400 via-purple-300 to-pink-300 shadow-sm group-hover:scale-105 transition-transform">
+                        <img id="headerLogo"
+                             src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                             onerror="this.src='https://placehold.co/120x120/FCE7F3/9333EA?text=YN'"
+                             alt="Yai Nori Logo"
+                             class="w-full h-full object-cover rounded-full bg-white">
+                    </div>
+                    <span class="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-pink-500 text-white text-[9px] flex items-center justify-center border border-white shadow-sm">
+                        <i class="ph-fill ph-sparkle"></i>
+                    </span>
+                </button>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1.5">
+                        <h1 id="displayShopName" class="font-cute font-bold text-lg sm:text-xl text-princess-textDark truncate leading-tight">
+                            Yai Nori
+                        </h1>
+                        <span class="ribbon-badge text-[10px] font-semibold px-2 py-0.5 rounded-full text-pink-600 shrink-0">
+                            Official
+                        </span>
+                    </div>
+                    <p id="displayShopSub" class="text-[11px] sm:text-xs text-princess-textMuted truncate mt-0.5">
+                        สตูดิโอรับทำผลงาน & เช็คสถานะคิวออนไลน์ ✨
+                    </p>
+                </div>
+            </div>
+
+            <!-- ฝั่งขวา: ปุ่มเมนูขีด 3 ขีด -->
+            <div class="flex items-center gap-2 shrink-0">
+                <button type="button" onclick="toggleDrawerMenu()" aria-label="เปิดเมนู" class="w-10 h-10 rounded-2xl bg-pink-50 hover:bg-pink-100 text-pink-600 flex items-center justify-center border border-pink-200/70 transition">
+                    <i class="ph-bold ph-list text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ==========================================
+             ส่วนที่ 2: ส่วนแบนเนอร์ (รูปเดียว รองรับ GIF ไร้กรอบขาว)
+        =========================================== -->
+        <section id="bannerSection" class="rounded-3xl overflow-hidden shadow-princess">
+            <img id="mainBannerImg"
+                 src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                 onerror="this.src='https://placehold.co/800x450/FCE7F3/9333EA?text=Yai+Nori+Banner'"
+                 alt="Yai Nori Banner"
+                 class="w-full h-56 sm:h-64 object-cover block">
+        </section>
+
+        <!-- ==========================================
+             ส่วนที่ 3: ส่วนเช็คคิว (มินิมอล)
+        =========================================== -->
+        <section id="searchSection" class="glass-card rounded-3xl p-4 sm:p-5 shadow-princess space-y-3">
+            <div class="flex items-center justify-between gap-2">
+                <h2 class="font-cute font-bold text-base text-princess-textDark flex items-center gap-1.5">
+                    <i class="ph-bold ph-magnifying-glass text-pink-500"></i>
+                    เช็คคิวงานของคุณ
+                </h2>
+                <span class="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-600 border border-purple-100">
+                    ค้นหาคิว
+                </span>
+            </div>
+
+            <form onsubmit="handleSearchQueue(event)" class="flex items-center gap-2">
+                <div class="relative flex-1 min-w-0">
+                    <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-400 text-base"></i>
+                    <input type="text"
+                           id="queueSearchInput"
+                           placeholder="เลขคิว, ชื่อลูกค้า หรือเบอร์โทร..."
+                           class="w-full pl-9 pr-3 py-2.5 rounded-2xl bg-white/95 border border-pink-200/90 text-sm text-princess-textDark placeholder:text-princess-textMuted/60 focus:outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-200/60 transition">
+                </div>
+                <button type="submit" class="btn-princess px-4 py-2.5 rounded-2xl text-white font-medium text-sm shrink-0">
+                    เช็คคิว
+                </button>
+            </form>
+
+            <!-- ปุ่มกดเลือกคิวตัวอย่าง -->
+            <div class="flex items-center flex-wrap gap-1.5 text-[11px] text-princess-textMuted">
+                <span>ตัวอย่าง:</span>
+                <button type="button" onclick="quickFillSearch('A123')" class="px-2.5 py-0.5 rounded-full bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200/70 font-medium transition">A123</button>
+                <button type="button" onclick="quickFillSearch('B042')" class="px-2.5 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/70 font-medium transition">B042</button>
+                <button type="button" onclick="quickFillSearch('B045')" class="px-2.5 py-0.5 rounded-full bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200/70 font-medium transition">B045</button>
+            </div>
+
+            <!-- ผลลัพธ์การค้นหาแบบกระชับ -->
+            <div id="minimalSearchResult" class="hidden"></div>
+        </section>
+
+        <!-- ==========================================
+             ส่วนที่ 4: แถบคิวที่กำลังดำเนินการ + รายการคิวทั้งหมด (แชทบับเบิล)
+        =========================================== -->
+        <section id="queueListSection" class="glass-card rounded-3xl p-4 sm:p-5 shadow-princess space-y-4">
+
+            <!-- แถบมาสคอตประกาศคิวที่กำลังดำเนินการ (แตะเพื่อเปิดป๊อปอัพดู % ความคืบหน้า) -->
+            <button type="button" onclick="openActiveQueuePopup()" class="w-full text-left p-3 rounded-2xl bg-gradient-to-r from-pink-50 via-white to-purple-50 border border-pink-200/80 hover:border-pink-300 shadow-sm flex items-center justify-between gap-3 transition group">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="relative shrink-0">
+                        <img id="mascotAvatarImg"
+                             src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                             onerror="this.src='https://placehold.co/80x80/FCE7F3/9333EA?text=YN'"
+                             alt="Active Queue Avatar"
+                             class="w-11 h-11 rounded-2xl object-cover border-2 border-white shadow-sm">
+                        <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-pink-500 border border-white"></span>
+                        </span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-[11px] font-semibold text-pink-500 flex items-center gap-1">
+                            <i class="ph-fill ph-flag-pennant"></i>
+                            กำลังดำเนินการอยู่ตอนนี้
+                        </div>
+                        <div id="activeMascotText" class="font-cute font-bold text-sm sm:text-base text-princess-textDark truncate">
+                            คิว A123 • กำลังให้บริการ
+                        </div>
+                        <div class="text-[11px] text-princess-textMuted flex items-center gap-1">
+                            <span>แตะเพื่อดู % ความคืบหน้าและรูปงาน</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-8 h-8 rounded-xl bg-white/90 border border-pink-100 text-pink-500 flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition">
+                    <i class="ph-bold ph-caret-right"></i>
+                </div>
+            </button>
+
+            <!-- หัวข้อรายการ "คิวทั้งหมด" -->
+            <div class="flex items-center justify-between pt-1">
+                <h3 class="font-cute font-bold text-base text-princess-textDark flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center">
+                        <i class="ph-fill ph-chats-circle text-base"></i>
+                    </span>
+                    คิวทั้งหมด
+                </h3>
+                <span id="waitingCountHeaderBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-purple-50 text-purple-600 border border-purple-200/80">
+                    รอคิว 0 คิว
+                </span>
+            </div>
+
+            <!-- รายการคิวรอแบบแชทบับเบิลสลับซ้าย-ขวา พร้อมรูป PNG โปร่งใส 2 รูป -->
+            <div id="waitingChatBubblesContainer" class="flex flex-col gap-2.5 pt-1">
+                <!-- สร้างด้วย JS -->
+            </div>
+        </section>
+
+        <!-- ==========================================
+             ส่วนที่ 5: ส่วนช่องทางติดต่อ
+        =========================================== -->
+        <section id="contactSection" class="glass-card rounded-3xl p-4 sm:p-5 shadow-princess space-y-3">
+            <div>
+                <h2 class="font-cute font-bold text-base text-princess-textDark flex items-center gap-1.5">
+                    <i class="ph-fill ph-heart text-pink-500"></i>
+                    ช่องทางติดต่อ
+                </h2>
+                <p class="text-xs text-princess-textMuted mt-0.5">ติดต่อสอบถามข้อมูลเพิ่มเติมหรือสั่งจองคิวได้ที่</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2.5">
+                <button type="button" onclick="openContactInfo('phone')" class="p-3 rounded-2xl bg-gradient-to-b from-pink-50 to-white border border-pink-200/80 hover:border-pink-300 hover:-translate-y-0.5 transition flex flex-col items-center text-center gap-1.5 shadow-sm">
+                    <span class="w-10 h-10 rounded-full bg-pink-500 text-white flex items-center justify-center shadow-sm">
+                        <i class="ph-fill ph-phone-call text-lg"></i>
+                    </span>
+                    <span class="font-semibold text-xs text-princess-textDark">โทรศัพท์</span>
+                    <span class="text-[10px] text-princess-textMuted">กดเพื่อโทร</span>
+                </button>
+
+                <button type="button" onclick="openContactInfo('line')" class="p-3 rounded-2xl bg-gradient-to-b from-purple-50 to-white border border-purple-200/80 hover:border-purple-300 hover:-translate-y-0.5 transition flex flex-col items-center text-center gap-1.5 shadow-sm">
+                    <span class="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center shadow-sm">
+                        <i class="ph-fill ph-chat-circle-dots text-lg"></i>
+                    </span>
+                    <span class="font-semibold text-xs text-princess-textDark">LINE</span>
+                    <span class="text-[10px] text-princess-textMuted">กดเพื่อแชท</span>
+                </button>
+
+                <button type="button" onclick="openContactInfo('message')" class="p-3 rounded-2xl bg-gradient-to-b from-rose-50 to-white border border-rose-200/80 hover:border-rose-300 hover:-translate-y-0.5 transition flex flex-col items-center text-center gap-1.5 shadow-sm">
+                    <span class="w-10 h-10 rounded-full bg-rose-400 text-white flex items-center justify-center shadow-sm">
+                        <i class="ph-fill ph-envelope-simple-open text-lg"></i>
+                    </span>
+                    <span class="font-semibold text-xs text-princess-textDark">ข้อความ</span>
+                    <span class="text-[10px] text-princess-textMuted">กดเพื่อส่งข้อความ</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- ฟุตเตอร์เล็กๆ -->
+        <footer class="text-center text-[11px] text-princess-textMuted/80 pt-2">
+            © Yai Nori Studio • ระบบเช็คคิวออนไลน์ (Demo)
+        </footer>
+    </main>
+
+    <!-- ==========================================
+         ปุ่มแผ่นเสียง CD สไตล์ตามแบบแนบ (อยู่มุมซ้ายค่อนกลางล่าง ไม่ล่างสุด)
+    =========================================== -->
+    <div id="vinylWidget" class="fixed left-3 sm:left-5 bottom-24 sm:bottom-28 z-40 select-none">
+        <div id="musicNotesContainer" class="relative">
+            <button type="button" onclick="toggleMusicPlayer()" aria-label="เปิดหรือปิดเพลง" title="แตะเพื่อเปิด/ปิดเพลง" class="relative w-16 h-16 sm:w-[70px] sm:h-[70px] rounded-full p-1 bg-white shadow-[0_8px_22px_rgba(236,72,153,0.28)] hover:scale-105 active:scale-95 transition-transform focus:outline-none">
+                <!-- แผ่น CD ด้านในที่หมุนได้ -->
+                <div id="vinylDisc" class="relative w-full h-full rounded-full p-[3px] bg-gradient-to-tr from-pink-300 via-purple-200 to-pink-200 flex items-center justify-center overflow-hidden">
+                    <div class="w-full h-full rounded-full p-[2px] bg-white overflow-hidden relative flex items-center justify-center">
+                        <img id="vinylLogoImg"
+                             src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                             onerror="this.src='https://placehold.co/120x120/FCE7F3/9333EA?text=CD'"
+                             alt="CD Cover"
+                             class="w-full h-full object-cover rounded-full opacity-95">
+                        <!-- รูตรงกลางแผ่น CD -->
+                        <div class="absolute w-5 h-5 rounded-full bg-white border-[3.5px] border-pink-300/90 shadow-inner"></div>
+                    </div>
+                </div>
+                <!-- ป้ายกลมตัวโน้ตมุมขวาล่างตามภาพตัวอย่าง -->
+                <span id="vinylNoteBadge" class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gradient-to-br from-pink-100 to-purple-100 border-2 border-white shadow-md flex items-center justify-center text-pink-600">
+                    <i id="vinylNoteIcon" class="ph-fill ph-music-note text-sm"></i>
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         มาสคอตข้อความอัตโนมัติ (มุมขวาล่าง กำหนดข้อความเดียวหรือหลายข้อความได้หลังบ้าน)
+    =========================================== -->
+    <div id="floatingMascotWidget" class="fixed right-3 sm:right-5 bottom-16 sm:bottom-20 z-40 flex flex-col items-end gap-2 max-w-[235px] sm:max-w-[265px] select-none pointer-events-none">
+        <div id="mascotAutoBubble"
+             onclick="window.cycleMascotMessageNow(true)"
+             title="แตะเพื่อเปลี่ยนข้อความถัดไป"
+             class="pointer-events-auto bg-white/95 backdrop-blur-md border border-pink-200 shadow-princess-sm rounded-2xl rounded-br-sm px-4 py-2.5 text-xs sm:text-[13px] text-princess-textDark leading-snug cursor-pointer transition-opacity duration-500 text-center">
+            ยินดีต้อนรับสู่ Yai Nori ค่ะ 🎀
+        </div>
+        <button type="button" onclick="window.cycleMascotMessageNow(true)" class="pointer-events-auto shrink-0 focus:outline-none hover:scale-105 transition-transform">
+            <img id="floatingMascotPng"
+                 src="https://i.postimg.cc/pLZ4BnRS/IMG-5175.png"
+                 onerror="this.src='https://placehold.co/80x80/FCE7F3/9333EA?text=YN'"
+                 alt="Yai Nori Mascot"
+                 class="w-20 h-20 sm:w-24 sm:h-24 object-contain drop-shadow-[0_6px_14px_rgba(244,114,182,0.35)] animate-gentle-float">
+        </button>
+    </div>
+
+    <!-- ==========================================
+         แถบเมนูด้านข้าง (Drawer Menu)
+    =========================================== -->
+    <div id="drawerBackdrop" onclick="toggleDrawerMenu()" class="fixed inset-0 bg-[#4A2545]/40 backdrop-blur-xs z-50 hidden"></div>
+    <aside id="drawerMenu" class="fixed top-0 right-0 h-full w-72 max-w-[85vw] bg-white/95 backdrop-blur-xl shadow-2xl border-l border-pink-100 z-50 translate-x-full transition-transform duration-300 flex flex-col p-5">
+        <div class="flex items-center justify-between pb-4 border-b border-pink-100">
+            <div class="flex items-center gap-2.5">
+                <img id="drawerLogo"
+                     src="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+                     onerror="this.src='https://placehold.co/80x80/FCE7F3/9333EA?text=YN'"
+                     alt="Logo"
+                     class="w-10 h-10 rounded-full object-cover border-2 border-pink-200">
+                <div>
+                    <div class="font-cute font-bold text-princess-textDark text-sm">Yai Nori</div>
+                    <div class="text-[11px] text-princess-textMuted">เมนูนำทาง</div>
+                </div>
+            </div>
+            <button type="button" onclick="toggleDrawerMenu()" class="w-8 h-8 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center hover:bg-pink-100">
+                <i class="ph-bold ph-x"></i>
+            </button>
+        </div>
+
+        <nav class="flex-1 py-4 space-y-2 text-sm">
+            <button type="button" onclick="scrollToSection('topSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
+                <i class="ph-fill ph-house text-pink-500 text-lg"></i> หน้าแรก
+            </button>
+            <button type="button" onclick="scrollToSection('searchSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
+                <i class="ph-fill ph-magnifying-glass text-purple-500 text-lg"></i> เช็คคิวงาน
+            </button>
+            <button type="button" onclick="scrollToSection('queueListSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
+                <i class="ph-fill ph-chats-circle text-pink-500 text-lg"></i> คิวทั้งหมด
+            </button>
+            <button type="button" onclick="scrollToSection('contactSection'); toggleDrawerMenu();" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-2xl hover:bg-pink-50 text-princess-textDark font-medium transition">
+                <i class="ph-fill ph-heart text-rose-500 text-lg"></i> ช่องทางติดต่อ
+            </button>
+        </nav>
+
+        <div class="pt-4 border-t border-pink-100">
+            <button type="button" onclick="toggleDrawerMenu(); toggleAdminModal();" class="w-full btn-princess py-3 rounded-2xl text-white font-semibold text-sm flex items-center justify-center gap-2">
+                <i class="ph-fill ph-crown"></i> จัดการหลังบ้าน (Admin)
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==========================================
+         ป๊อปอัพแสดง % ความคืบหน้าของคิว
+    =========================================== -->
+    <div id="queueDetailModal" onclick="if(event.target === this) closeQueueDetailModal()" class="fixed inset-0 bg-[#4A2545]/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl border-2 border-pink-200/80 space-y-4">
+            <div class="flex items-center justify-between gap-2">
+                <h3 id="queueDetailModalTitle" class="font-cute font-bold text-base text-princess-textDark flex items-center gap-2">
+                    <span class="w-7 h-7 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center">
+                        <i class="ph-fill ph-sparkle"></i>
+                    </span>
+                    รายละเอียดความคืบหน้า
+                </h3>
+                <button type="button" onclick="closeQueueDetailModal()" class="w-8 h-8 rounded-xl bg-pink-50 text-pink-500 hover:bg-pink-100 flex items-center justify-center">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div id="queueDetailModalBody">
+                <!-- สร้างด้วย JS -->
+            </div>
+
+            <button type="button" onclick="closeQueueDetailModal()" class="w-full btn-princess py-2.5 rounded-2xl text-white font-medium text-sm">
+                ปิดหน้าต่าง 🎀
+            </button>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         ป๊อปอัปรูปภาพความคืบหน้างาน
+    =========================================== -->
+    <div id="progressPhotoModal" onclick="if(event.target === this) closeProgressPhotoModal()" class="fixed inset-0 bg-[#4A2545]/60 backdrop-blur-sm z-[60] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-4 sm:p-5 shadow-2xl border-2 border-pink-200 space-y-3 text-center">
+            <div class="flex items-center justify-between">
+                <span id="progressPhotoTitle" class="font-bold text-sm text-princess-textDark flex items-center gap-1.5">
+                    <i class="ph-fill ph-image text-pink-500"></i> รูปอัปเดตความคืบหน้า
+                </span>
+                <button type="button" onclick="closeProgressPhotoModal()" class="w-7 h-7 rounded-xl bg-pink-50 text-pink-500 flex items-center justify-center hover:bg-pink-100">
+                    <i class="ph-bold ph-x text-sm"></i>
+                </button>
+            </div>
+            <div class="rounded-2xl overflow-hidden border border-pink-100 bg-princess-bg">
+                <img id="progressPhotoImg" src="" onerror="this.src='https://placehold.co/600x450/FCE7F3/9333EA?text=Yai+Nori+Work+Progress'" alt="รูปความคืบหน้า" class="w-full max-h-72 object-cover">
+            </div>
+            <p id="progressPhotoCaption" class="text-xs text-princess-textMuted"></p>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         ป๊อปอัประบบหลังบ้าน (Admin Panel - Demo)
+    =========================================== -->
+    <div id="adminModal" onclick="if(event.target === this) toggleAdminModal()" class="fixed inset-0 bg-[#4A2545]/55 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl border-2 border-pink-200">
+            <!-- ส่วนหัว Modal หลังบ้าน -->
+            <div class="bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 text-white px-5 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-2xl bg-white/25 backdrop-blur-sm flex items-center justify-center text-xl">
+                        <i class="ph-fill ph-crown"></i>
+                    </span>
+                    <div>
+                        <h3 class="font-cute font-bold text-base sm:text-lg leading-tight">ระบบหลังบ้าน Yai Nori (Demo)</h3>
+                        <p class="text-[11px] text-white/90">จัดการคิวงานลูกค้า & แก้ไขข้อมูลรูปภาพภายในเว็บ</p>
+                    </div>
+                </div>
+                <button type="button" onclick="toggleAdminModal()" class="w-9 h-9 rounded-2xl bg-white/20 hover:bg-white/30 flex items-center justify-center transition">
+                    <i class="ph-bold ph-x text-lg"></i>
+                </button>
+            </div>
+
+            <!-- แถบเลือกแท็บหลังบ้าน -->
+            <div class="flex gap-2 px-5 pt-3 border-b border-pink-100 bg-princess-bg/60 shrink-0">
+                <button type="button" id="tabBtn-queues" onclick="switchAdminTab('queues')" class="px-4 py-2.5 rounded-t-2xl text-xs sm:text-sm font-semibold bg-white text-pink-600 border-t border-x border-pink-200 flex items-center gap-1.5 -mb-px">
+                    <i class="ph-fill ph-users-three"></i> จัดการคิวงานลูกค้า
+                </button>
+                <button type="button" id="tabBtn-settings" onclick="switchAdminTab('settings')" class="px-4 py-2.5 rounded-t-2xl text-xs sm:text-sm font-medium text-princess-textMuted hover:text-pink-600 flex items-center gap-1.5">
+                    <i class="ph-fill ph-image-square"></i> แก้ไขรูป & ข้อมูลเว็บ
+                </button>
+            </div>
+
+            <!-- เนื้อหาใน Modal หลังบ้าน -->
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-5 flex-1">
+                <!-- แท็บที่ 1: จัดการคิวงานลูกค้า -->
+                <div id="adminTab-queues" class="space-y-5">
+                    <!-- ฟอร์มเพิ่ม/แก้ไขคิว -->
+                    <form onsubmit="saveQueueForm(event)" class="bg-princess-bg p-4 rounded-2xl border border-pink-200/80 space-y-3 text-xs">
+                        <input type="hidden" id="editQueueIndex" value="-1">
+                        <h4 class="font-bold text-sm text-pink-600 flex items-center gap-1.5">
+                            <i class="ph-fill ph-plus-circle"></i> เพิ่มคิวงานใหม่ / แก้ไขคิว
+                        </h4>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">เลขคิว *</label>
+                                <input type="text" id="formQueueCode" required placeholder="เช่น A124, B046" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">ชื่อลูกค้า / เบอร์โทร *</label>
+                                <input type="text" id="formCustomer" required placeholder="เช่น คุณมิ้นท์ (089-xxx-xxxx)" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">รายละเอียดงาน / บริการ</label>
+                                <input type="text" id="formService" placeholder="เช่น สั่งทำเคสเรซิ่นพาสเทล" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">ข้อความสถานะหลัก</label>
+                                <input type="text" id="formStatusText" placeholder="เช่น กำลังให้บริการ / รอคิว" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">ข้อความรอง (เวลา/หมายเหตุ)</label>
+                                <input type="text" id="formSubStatus" placeholder="เช่น ประมาณ 15 นาที / กำลังลงสี" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">ระดับความคืบหน้า *</label>
+                                <select id="formStep" onchange="syncPercentWithStep()" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                                    <!-- สร้างตัวเลือกจาก progressStages ด้วย JS -->
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">เปอร์เซ็นต์ความคืบหน้า (0 - 100%)</label>
+                                <input type="number" id="formProgressPercent" min="0" max="100" value="15" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            </div>
+                            <div>
+                                <label class="block text-princess-textMuted font-medium mb-1">ลิงก์รูปภาพความคืบหน้างาน (ไม่บังคับ)</label>
+                                <input type="text" id="formProgressImage" placeholder="วาง URL รูปอัปเดตงาน..." class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 pt-1">
+                            <button type="submit" class="btn-princess px-4 py-2 rounded-xl text-white font-semibold flex items-center gap-1.5">
+                                <i class="ph-bold ph-check"></i> บันทึกข้อมูลคิว
+                            </button>
+                            <button type="button" onclick="resetQueueForm()" class="px-4 py-2 rounded-xl bg-white border border-pink-200 text-princess-textMuted hover:bg-pink-50 font-medium">
+                                ล้างฟอร์ม
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- รายการคิวปัจจุบันพร้อมปุ่มเปลี่ยนสถานะด่วน -->
+                    <div>
+                        <h4 class="font-bold text-sm text-princess-textDark mb-2.5">รายการคิวทั้งหมดในระบบ (คลิกเปลี่ยนสถานะได้ทันที)</h4>
+                        <div id="adminQueueList" class="space-y-2.5">
+                            <!-- สร้างด้วย JS -->
+                        </div>
+                    </div>
+
+                    <!-- จัดการระดับความคืบหน้า / สถานะงาน (เพิ่ม แก้ไข ลบ ได้เอง) -->
+                    <div class="bg-princess-bg p-4 rounded-2xl border border-purple-200/80 space-y-3">
+                        <h4 class="font-bold text-sm text-purple-700 flex items-center gap-1.5">
+                            <i class="ph-fill ph-sliders text-pink-500"></i> จัดการระดับความคืบหน้า (เพิ่ม / แก้ไข / ลบ ได้)
+                        </h4>
+                        <div class="flex flex-wrap sm:flex-nowrap gap-2 text-xs">
+                            <input type="text" id="newStageName" placeholder="ชื่อขั้น เช่น กำลังร่างแบบ / ลงสี" class="flex-1 px-3 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400">
+                            <input type="number" id="newStagePercent" min="0" max="100" value="50" placeholder="%" class="w-20 px-2.5 py-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:border-pink-400 text-center">
+                            <button type="button" onclick="addProgressStage()" class="px-3.5 py-2 rounded-xl btn-princess text-white font-medium shrink-0">
+                                + เพิ่มขั้น
+                            </button>
+                        </div>
+                        <div id="adminStagesList" class="space-y-2">
+                            <!-- รายการขั้นความคืบหน้าจะสร้างด้วย JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- แท็บที่ 2: แก้ไขรูปภาพและข้อมูลเว็บไซต์ -->
+                <div id="adminTab-settings" class="hidden space-y-4 text-xs">
+                    <div class="bg-princess-bg p-4 rounded-2xl border border-pink-200/80 space-y-3">
+                        <h4 class="font-bold text-sm text-pink-600 flex items-center gap-1.5">
+                            <i class="ph-fill ph-paint-brush"></i> แก้ไขข้อมูลร้าน & รูปภาพภายในเว็บ
+                        </h4>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">ชื่อร้าน / ชื่อเว็บ</label>
+                                <input type="text" id="settingShopName" value="Yai Nori" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">คำอธิบายใต้ชื่อร้าน</label>
+                                <input type="text" id="settingShopSub" value="สตูดิโอรับทำผลงาน & เช็คสถานะคิวออนไลน์ ✨" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">ลิงก์รูปโลโก้ร้าน (และหน้าปกแผ่นเสียง)</label>
+                                <input type="text" id="settingLogoUrl" value="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">ลิงก์รูปแบนเนอร์ (รองรับ JPG / PNG / GIF)</label>
+                                <input type="text" id="settingBannerUrl" value="https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-pink-100">
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">รูป PNG ตัวการ์ตูนวิ่งบนแถบ % (พื้นหลังโปร่งใส)</label>
+                                <input type="text" id="settingRunnerPngUrl" value="https://i.postimg.cc/pLZ4BnRS/IMG-5175.png" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">รูป PNG ฝั่งซ้ายในรายการคิว (พื้นหลังโปร่งใส)</label>
+                                <input type="text" id="settingChatLeftPngUrl" value="https://i.postimg.cc/rp2s53Fq/mi-m-ch-x-55-20261115005344.png" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block font-medium text-princess-textMuted mb-1">รูป PNG ฝั่งขวาในรายการคิว (สลับใช้ไปมา)</label>
+                                <input type="text" id="settingChatRightPngUrl" value="https://i.postimg.cc/3Rnw5wX6/mi-m-ch-x-37-20261027142435.png" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                        </div>
+
+                        <!-- ตั้งค่ามาสคอตข้อความอัตโนมัติ -->
+                        <div class="pt-3 border-t border-pink-100 space-y-2.5">
+                            <h5 class="font-bold text-xs text-purple-700 flex items-center gap-1.5">
+                                <i class="ph-fill ph-chat-teardrop-dots text-pink-500"></i> ตั้งค่ามาสคอตข้อความอัตโนมัติ (ใส่ข้อความเดียวหรือหลายข้อความก็ได้)
+                            </h5>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">ลิงก์รูปมาสคอต PNG (พื้นหลังโปร่งใส)</label>
+                                <input type="text" id="settingMascotFloatUrl" value="https://i.postimg.cc/pLZ4BnRS/IMG-5175.png" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">ข้อความอัตโนมัติ (ขึ้นบรรทัดใหม่เพื่อเพิ่มหลายข้อความ ระบบจะสลับอัตโนมัติ)</label>
+                                <textarea id="settingMascotMessages" rows="3" placeholder="พิมพ์ข้อความของมาสคอต..." class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white text-xs leading-relaxed">ยินดีต้อนรับสู่ Yai Nori ค่ะ 🎀
+พิมพ์เลขคิวเพื่อเช็คสถานะได้เลยนะคะ ✨
+ขอบคุณที่อุดหนุนผลงานของเราน้า 💖</textarea>
+                            </div>
+                        </div>
+
+                        <!-- ข้อมูลช่องทางติดต่อ -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-pink-100">
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">เบอร์โทรศัพท์</label>
+                                <input type="text" id="settingPhone" value="089-123-4567" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">LINE Official</label>
+                                <input type="text" id="settingLine" value="@yainori.studio" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-medium text-princess-textMuted mb-1">ช่องทางข้อความ / เพจ</label>
+                                <input type="text" id="settingMessage" value="FB / IG: Yai Nori Studio" class="w-full px-3 py-2 rounded-xl border border-pink-200 bg-white">
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button type="button" onclick="saveSiteSettings()" class="btn-princess px-5 py-2.5 rounded-xl text-white font-semibold flex items-center gap-1.5">
+                                <i class="ph-bold ph-floppy-disk"></i> บันทึกและอัปเดตหน้าเว็บ
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="text-[11px] text-princess-textMuted bg-amber-50 border border-amber-200 rounded-2xl p-3">
+                        <i class="ph-fill ph-info text-amber-500 mr-1"></i>
+                        หมายเหตุ Demo: ข้อมูลในระบบหลังบ้านนี้ถูกจัดเก็บชั่วคราวในเบราว์เซอร์เพื่อทดสอบเท่านั้น ยังไม่ได้เชื่อมต่อฐานข้อมูลจริงหรือระบบยืนยันตัวตนค่ะ
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         กล่องแจ้งเตือนแบบน่ารัก (แทน alert() ทุกจุด)
+    =========================================== -->
+    <div id="customDialog" onclick="if(event.target === this) closeDialog()" class="fixed inset-0 bg-[#4A2545]/50 backdrop-blur-xs z-[70] hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xs w-full p-5 shadow-2xl border-2 border-pink-200 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-pink-50 text-pink-500 flex items-center justify-center mx-auto text-2xl">
+                <i class="ph-fill ph-sparkle"></i>
+            </div>
+            <h4 id="dialogTitle" class="font-cute font-bold text-base text-princess-textDark">แจ้งเตือน</h4>
+            <p id="dialogMessage" class="text-xs text-princess-textMuted leading-relaxed"></p>
+            <div id="dialogActions" class="flex items-center justify-center gap-2 pt-1">
+                <button type="button" onclick="closeDialog()" class="btn-princess px-5 py-2 rounded-2xl text-white text-xs font-semibold">
+                    ตกลงค่ะ 🎀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         JavaScript ควบคุมระบบทั้งหมด
+    =========================================== -->
+    <script>
+        // 1. ค่าตั้งต้นของรูปภาพและข้อมูลร้าน
+        let bannerImageUrl = "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg";
+        let shopLogoUrl = "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg";
+        let runnerPngUrl = "https://i.postimg.cc/pLZ4BnRS/IMG-5175.png";
+        let chatLeftPngUrl = "https://i.postimg.cc/rp2s53Fq/mi-m-ch-x-55-20261115005344.png";
+        let chatRightPngUrl = "https://i.postimg.cc/3Rnw5wX6/mi-m-ch-x-37-20261027142435.png";
+        let mascotWidgetPngUrl = "https://i.postimg.cc/pLZ4BnRS/IMG-5175.png";
+
+        // ข้อมูลช่องทางติดต่อ
+        const contactInfo = {
+            phone: "089-123-4567",
+            line: "@yainori.studio",
+            message: "FB / IG: Yai Nori Studio"
+        };
+
+        // 2. ระดับความคืบหน้า (สามารถเพิ่ม แก้ไข ลบ ได้เองในระบบหลังบ้าน)
+        let nextStageId = 4;
+        let progressStages = [
+            { id: 1, name: "รอคิว", defaultPercent: 15 },
+            { id: 2, name: "กำลังให้บริการ", defaultPercent: 68 },
+            { id: 3, name: "เสร็จสิ้น", defaultPercent: 100 }
+        ];
+
+        // 3. ข้อมูลคิวตัวอย่าง (Demo)
+        let queuesData = [
+            {
+                code: "A123",
+                customer: "คุณหนูโรส (081-234-5678)",
+                service: "งานสั่งทำพิเศษ เซ็ตโบว์ชมพูพาสเทล",
+                statusText: "กำลังให้บริการ",
+                subStatus: "ช่างกำลังจัดเตรียมรายละเอียดขั้นตอนสุดท้ายค่ะ",
+                step: 2,
+                percent: 68,
+                progressImage: "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+            },
+            {
+                code: "B042",
+                customer: "คุณลิลลี่ (086-111-2233)",
+                service: "กรอบรูปเรซิ่นกากเพชรลาเวนเดอร์",
+                statusText: "รอคิว",
+                subStatus: "คิวถัดไป ประมาณ 10 นาทีค่ะ",
+                step: 1,
+                percent: 20,
+                progressImage: "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+            },
+            {
+                code: "B043",
+                customer: "คุณเอวา (082-333-4455)",
+                service: "เคสตกแต่งอะไหล่เพชรพาสเทล",
+                statusText: "รอคิว",
+                subStatus: "รออีก 2 คิว ประมาณ 20 นาทีค่ะ",
+                step: 1,
+                percent: 15,
+                progressImage: ""
+            },
+            {
+                code: "B045",
+                customer: "คุณมิลิน (089-876-5432)",
+                service: "คิวงานออกแบบและตกแต่งคอลเลกชันพาสเทล",
+                statusText: "รอคิว",
+                subStatus: "รออีก 3 คิว ประมาณ 30 นาทีค่ะ",
+                step: 1,
+                percent: 10,
+                progressImage: ""
+            },
+            {
+                code: "C089",
+                customer: "คุณแพรวา (090-555-7890)",
+                service: "พวงกุญแจลูกปัดคริสตัลชมพู",
+                statusText: "เสร็จสิ้น",
+                subStatus: "งานเรียบร้อย พร้อมส่งมอบแล้วค่ะ ✨",
+                step: 3,
+                percent: 100,
+                progressImage: "https://i.postimg.cc/tRLXLVpp/IMG-5174.jpg"
+            }
+        ];
+
+        // เก็บเลขคิวที่กำลังถูกไฮไลต์จากการค้นหา
+        let highlightedQueueCode = null;
+
+        // 4. ข้อความอัตโนมัติของมาสคอตมุมขวาล่าง
+        let mascotAutoMessages = [
+            "ยินดีต้อนรับสู่ Yai Nori ค่ะ 🎀",
+            "พิมพ์เลขคิวเพื่อเช็คสถานะได้เลยนะคะ ✨",
+            "ขอบคุณที่อุดหนุนผลงานของเราน้า 💖"
+        ];
+        let mascotMsgIndex = 0;
+        let mascotTimer = null;
+        let mascotFadeTimeout = null;
+
+        // ฟังก์ชันป้องกัน XSS และอักขระพิเศษใน HTML/Attribute
+        function escapeHtml(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // เปลี่ยนข้อความมาสคอตทันทีเมื่อผู้ใช้แตะ (หรือเมื่อถึงรอบเวลา)
+        window.cycleMascotMessageNow = function(isManualTap = false) {
+            const bubbleEl = document.getElementById('mascotAutoBubble');
+            if (!bubbleEl || !mascotAutoMessages || mascotAutoMessages.length <= 1) return;
+
+            // หากผู้ใช้แตะเปลี่ยนเอง ให้รีเซ็ตเวลารอบถัดไปเพื่อไม่ให้เปลี่ยนซ้ำเร็วเกินไป
+            if (isManualTap && mascotTimer) {
+                clearInterval(mascotTimer);
+                mascotTimer = setInterval(() => {
+                    window.cycleMascotMessageNow(false);
+                }, 6500);
+            }
+
+            if (mascotFadeTimeout) clearTimeout(mascotFadeTimeout);
+            mascotMsgIndex = (mascotMsgIndex + 1) % mascotAutoMessages.length;
+            bubbleEl.style.opacity = '0';
+            mascotFadeTimeout = setTimeout(() => {
+                bubbleEl.textContent = mascotAutoMessages[mascotMsgIndex];
+                bubbleEl.style.opacity = '1';
+            }, 350);
+        };
+
+        // เริ่มระบบสลับข้อความอัตโนมัติของมาสคอต
+        window.startMascotAutoMessages = function() {
+            if (mascotTimer) clearInterval(mascotTimer);
+            if (mascotFadeTimeout) clearTimeout(mascotFadeTimeout);
+            const bubbleEl = document.getElementById('mascotAutoBubble');
+            if (!bubbleEl) return;
+
+            if (!mascotAutoMessages || mascotAutoMessages.length === 0) {
+                bubbleEl.classList.add('hidden');
+                return;
+            }
+
+            bubbleEl.classList.remove('hidden');
+            bubbleEl.style.opacity = '1';
+            mascotMsgIndex = 0;
+            bubbleEl.textContent = mascotAutoMessages[0];
+
+            if (mascotAutoMessages.length > 1) {
+                mascotTimer = setInterval(() => {
+                    window.cycleMascotMessageNow(false);
+                }, 6500);
+            }
+        };
+
+        // อัปเดตรูปแบนเนอร์
+        function renderBanner() {
+            const img = document.getElementById('mainBannerImg');
+            if (img && bannerImageUrl) {
+                img.src = bannerImageUrl;
+            }
+        }
+
+        // อัปเดตแถบคิวที่กำลังดำเนินการอยู่ตอนนี้
+        function renderActiveMascot() {
+            const textEl = document.getElementById('activeMascotText');
+            if (!textEl) return;
+            const firstStageId = progressStages[0]?.id ?? 1;
+            const lastStageId = progressStages[progressStages.length - 1]?.id ?? 3;
+            const activeItem = queuesData.find(q => q.step !== firstStageId && q.step !== lastStageId) || queuesData[0];
+
+            if (activeItem) {
+                textEl.textContent = `คิว ${activeItem.code} • ${activeItem.statusText}`;
+            } else {
+                textEl.textContent = "ยังไม่มีคิวที่กำลังดำเนินการค่ะ";
+            }
+        }
+
+        // แสดงรายการ "คิวทั้งหมด" แบบแชทบับเบิลสลับซ้าย-ขวา พร้อมรูป PNG โปร่งใส 2 รูป
+        function renderWaitingChatBubbles() {
+            const container = document.getElementById('waitingChatBubblesContainer');
+            const countBadge = document.getElementById('waitingCountHeaderBadge');
+            if (!container || !countBadge) return;
+
+            const firstStageId = progressStages[0]?.id ?? 1;
+            const waitingList = queuesData.filter(q => q.step === firstStageId);
+            countBadge.textContent = `รอคิว ${waitingList.length} คิว`;
+
+            if (waitingList.length === 0) {
+                container.innerHTML = `
+                    <div class="w-full text-center py-6 text-xs text-princess-textMuted">
+                        🎀 ตอนนี้ไม่มีคิวรอค่ะ
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = waitingList.map((item, idx) => {
+                const isMine = highlightedQueueCode && item.code.toUpperCase() === highlightedQueueCode.toUpperCase();
+                const isRightSide = idx % 2 === 1;
+                const shortStatus = idx === 0 ? 'คิวถัดไป' : 'รอคิว';
+                const avatarUrl = isRightSide ? chatRightPngUrl : chatLeftPngUrl;
+
+                const bubbleStyle = isMine
+                    ? 'bg-gradient-to-r from-pink-100 to-pink-50 border-pink-400 text-princess-textDark ring-2 ring-pink-300/60 shadow-sm'
+                    : isRightSide
+                        ? 'bg-white border-pink-200/80 text-princess-textDark shadow-sm'
+                        : 'bg-purple-50/95 border-purple-200/80 text-princess-textDark shadow-sm';
+
+                const bubbleCornerClass = isRightSide ? 'chat-queue-bubble-right' : 'chat-queue-bubble';
+                const rowAlignClass = isRightSide ? 'self-end flex-row-reverse' : 'self-start flex-row';
+
+                return `
+                    <div id="bubble-queue-${escapeHtml(item.code)}" onclick="openQueueDetailByCode('${escapeHtml(item.code)}')" class="flex items-end gap-2 max-w-[92%] cursor-pointer group ${rowAlignClass}">
+                        <img src="${escapeHtml(avatarUrl)}"
+                             onerror="this.src='https://placehold.co/60x60/FCE7F3/9333EA?text=YN'"
+                             alt="Queue Avatar PNG"
+                             class="w-10 h-10 object-contain drop-shadow-sm shrink-0 group-hover:scale-105 transition">
+                        <div class="${bubbleCornerClass} border px-3.5 py-2 ${bubbleStyle}">
+                            <div class="flex flex-wrap items-center gap-1.5 text-xs">
+                                <span class="font-bold font-cute ${isMine ? 'text-pink-600' : 'text-purple-700'}">${escapeHtml(item.code)}</span>
+                                <span class="text-princess-textMuted">·</span>
+                                <span class="font-medium text-princess-textDark">${escapeHtml(item.customer)}</span>
+                                <span class="px-1.5 py-0.5 rounded-full text-[10px] font-semibold ${isMine ? 'bg-pink-500 text-white' : 'bg-white/90 text-purple-600 border border-purple-100'}">
+                                    ${isMine ? 'คิวของคุณ' : shortStatus}
+                                </span>
+                            </div>
+                            <div class="text-[11px] text-princess-textMuted mt-0.5 flex items-center gap-1">
+                                <i class="ph-fill ph-sparkle text-pink-400 text-[10px] shrink-0"></i>
+                                <span class="truncate">${escapeHtml(item.service || 'รายการทั่วไป')}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // อัปเดตทุกส่วนบนหน้าเว็บพร้อมกัน
+        function refreshAllViews() {
+            renderBanner();
+            renderActiveMascot();
+            renderWaitingChatBubbles();
+        }
+
+        // ปุ่มเติมเลขคิวตัวอย่างลงช่องค้นหาแล้วค้นหาทันที
+        function quickFillSearch(code) {
+            const input = document.getElementById('queueSearchInput');
+            if (input) {
+                input.value = code;
+                handleSearchQueue();
+            }
+        }
+
+        // ค้นหาคิว
+        function handleSearchQueue(event) {
+            if (event) event.preventDefault();
+            const input = document.getElementById('queueSearchInput');
+            const resultArea = document.getElementById('minimalSearchResult');
+            const query = (input?.value || '').trim().toUpperCase();
+
+            if (!query) {
+                highlightedQueueCode = null;
+                if (resultArea) resultArea.classList.add('hidden');
+                renderWaitingChatBubbles();
+                return;
+            }
+
+            const matched = queuesData.find(q =>
+                q.code.toUpperCase().includes(query) ||
+                q.customer.toUpperCase().includes(query)
+            );
+
+            if (!matched) {
+                highlightedQueueCode = null;
+                renderWaitingChatBubbles();
+                if (resultArea) {
+                    resultArea.classList.remove('hidden');
+                    resultArea.innerHTML = `
+                        <div class="p-3 rounded-2xl bg-rose-50/80 border border-rose-200 text-xs text-rose-600 flex items-center justify-between gap-2">
+                            <span>ไม่พบข้อมูลคิว "<b>${escapeHtml(query)}</b>" ลองตรวจสอบเลขคิวอีกครั้งนะคะ</span>
+                            <button type="button" onclick="clearSearchResult()" class="text-rose-400 hover:text-rose-600 shrink-0"><i class="ph-bold ph-x"></i></button>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            const firstStageId = progressStages[0]?.id ?? 1;
+            const lastStageId = progressStages[progressStages.length - 1]?.id ?? 3;
+            const isWaiting = matched.step === firstStageId;
+
+            highlightedQueueCode = isWaiting ? matched.code : null;
+            renderWaitingChatBubbles();
+
+            const statusColor = matched.step === lastStageId
+                ? 'text-emerald-600 bg-emerald-50'
+                : matched.step !== firstStageId
+                    ? 'text-pink-600 bg-pink-50'
+                    : 'text-purple-600 bg-purple-50';
+
+            if (resultArea) {
+                resultArea.classList.remove('hidden');
+                resultArea.innerHTML = `
+                    <div class="p-3.5 rounded-2xl bg-princess-bg border border-pink-200/80 space-y-2.5 text-xs">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold text-base font-cute text-pink-600">${escapeHtml(matched.code)}</span>
+                                    <span class="px-2 py-0.5 rounded-full text-[11px] font-semibold ${statusColor}">${escapeHtml(matched.statusText)}</span>
+                                </div>
+                                <div class="font-medium text-princess-textDark mt-0.5">${escapeHtml(matched.customer)}</div>
+                                <div class="text-princess-textMuted">${escapeHtml(matched.service || '')}</div>
+                            </div>
+                            <button type="button" onclick="clearSearchResult()" class="p-1 text-princess-textMuted hover:text-pink-600"><i class="ph-bold ph-x"></i></button>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2 pt-1">
+                            <button type="button" onclick="openQueueDetailByCode('${escapeHtml(matched.code)}')" class="px-3 py-1.5 rounded-xl bg-white border border-pink-200 text-pink-600 font-medium hover:bg-pink-50 transition">
+                                ดู % ความคืบหน้า
+                            </button>
+                            ${isWaiting ? `
+                                <button type="button" onclick="scrollToMyBubble('${escapeHtml(matched.code)}')" class="px-3 py-1.5 rounded-xl btn-princess text-white font-medium">
+                                    ดูตำแหน่งคิวของฉัน
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // เลื่อนไปยังบับเบิลของลูกค้าและขยายตัวเบาๆ 1 ครั้ง
+        function scrollToMyBubble(code) {
+            const bubbleEl = document.getElementById(`bubble-queue-${code}`);
+            if (!bubbleEl) return;
+            bubbleEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            bubbleEl.classList.remove('bubble-pulse-once');
+            void bubbleEl.offsetWidth;
+            bubbleEl.classList.add('bubble-pulse-once');
+        }
+
+        function clearSearchResult() {
+            const input = document.getElementById('queueSearchInput');
+            const resultArea = document.getElementById('minimalSearchResult');
+            if (input) input.value = '';
+            if (resultArea) resultArea.classList.add('hidden');
+            highlightedQueueCode = null;
+            renderWaitingChatBubbles();
+        }
+
+        // สร้าง HTML แสดงแถบเปอร์เซ็นต์ (%) ความคืบหน้า พร้อมรูป PNG ลอยด้านบนตาม % และปุ่มดูรูปงาน
+        function buildQueueProgressHtml(item) {
+            const pct = typeof item.percent === 'number'
+                ? Math.min(100, Math.max(0, item.percent))
+                : (item.step === 1 ? 15 : item.step === 2 ? 65 : 100);
+
+            const lastStageId = progressStages[progressStages.length - 1]?.id ?? 3;
+            const firstStageId = progressStages[0]?.id ?? 1;
+            const statusBadgeClass = item.step === lastStageId
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                : item.step !== firstStageId
+                    ? 'bg-pink-50 text-pink-600 border-pink-200'
+                    : 'bg-purple-50 text-purple-600 border-purple-200';
+
+            const clampedLeft = Math.min(92, Math.max(8, pct));
+            const midStageName = progressStages[Math.floor((progressStages.length - 1) / 2)]?.name || 'ดำเนินการ';
+
+            return `
+                <div class="p-4 rounded-2xl bg-princess-bg border border-pink-100 space-y-3.5 text-xs">
+                    <div class="flex items-start justify-between gap-2 pb-2.5 border-b border-pink-100">
+                        <div>
+                            <div class="text-[11px] text-princess-textMuted">เลขคิว</div>
+                            <div class="font-cute font-bold text-2xl text-pink-600 leading-tight">${escapeHtml(item.code)}</div>
+                        </div>
+                        <div class="text-right space-y-1">
+                            <div class="text-[10px] text-princess-textMuted">สถานะปัจจุบัน</div>
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${statusBadgeClass}">
+                                ${escapeHtml(item.statusText)}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <div class="flex gap-2">
+                            <span class="text-princess-textMuted w-16 shrink-0">ชื่อลูกค้า:</span>
+                            <span class="font-medium text-princess-textDark">${escapeHtml(item.customer)}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-princess-textMuted w-16 shrink-0">รายการ:</span>
+                            <span class="font-medium text-purple-700">${escapeHtml(item.service || '-')}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-princess-textMuted w-16 shrink-0">รายละเอียด:</span>
+                            <span class="text-pink-600">${escapeHtml(item.subStatus || '-')}</span>
+                        </div>
+                    </div>
+
+                    <!-- ส่วนแถบ % ความคืบหน้า + รูป PNG ลอยตาม % + ปุ่มดูรูปความคืบหน้า -->
+                    <div class="pt-2">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-semibold text-princess-textDark flex items-center gap-1">
+                                ความคืบหน้างาน
+                                <span class="font-cute font-bold text-pink-600 text-sm">${pct}%</span>
+                            </span>
+                            <button type="button" onclick="openProgressPhotoModal('${escapeHtml(item.code)}')" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white hover:bg-pink-50 border border-pink-200 text-pink-600 font-medium text-[11px] shadow-xs transition">
+                                <i class="ph-fill ph-image text-sm"></i> ดูรูปงาน
+                            </button>
+                        </div>
+
+                        <!-- พื้นที่รูป PNG ลอยด้านบนตามเปอร์เซ็นต์ -->
+                        <div class="relative pt-12">
+                            <div style="left: ${clampedLeft}%" class="absolute top-1 -translate-x-1/2 transition-all duration-500 flex flex-col items-center pointer-events-none">
+                                <img src="${escapeHtml(runnerPngUrl)}"
+                                     onerror="this.src='https://placehold.co/60x60/FCE7F3/9333EA?text=YN'"
+                                     alt="Progress Runner PNG"
+                                     class="w-10 h-10 object-contain drop-shadow-[0_3px_6px_rgba(236,72,153,0.3)] animate-gentle-float">
+                            </div>
+
+                            <!-- แถบ Progress Bar -->
+                            <div class="w-full h-3 rounded-full bg-pink-100/90 overflow-hidden p-0.5 border border-pink-200/70">
+                                <div style="width: ${pct}%" class="h-full rounded-full bg-gradient-to-r from-pink-400 via-purple-400 to-pink-500 transition-all duration-500"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between text-[10px] text-princess-textMuted mt-1.5">
+                            <span>0% ${escapeHtml(progressStages[0]?.name || 'รับคิว')}</span>
+                            <span>50% ${escapeHtml(midStageName)}</span>
+                            <span>100% ${escapeHtml(progressStages[progressStages.length - 1]?.name || 'เสร็จสิ้น')}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // เปิดป๊อปอัพคิวที่กำลังดำเนินการ
+        function openActiveQueuePopup() {
+            const firstStageId = progressStages[0]?.id ?? 1;
+            const lastStageId = progressStages[progressStages.length - 1]?.id ?? 3;
+            const activeItem = queuesData.find(q => q.step !== firstStageId && q.step !== lastStageId) || queuesData[0];
+            if (!activeItem) {
+                showDialog('ยังไม่มีคิวที่กำลังดำเนินการ', 'ขณะนี้ยังไม่มีคิวที่กำลังทำอยู่ค่ะ 🎀');
+                return;
+            }
+            openQueueDetailModal(activeItem, 'คิวที่กำลังดำเนินการอยู่ตอนนี้');
+        }
+
+        function openQueueDetailByCode(code) {
+            const item = queuesData.find(q => q.code.toUpperCase() === code.toUpperCase());
+            if (!item) return;
+            openQueueDetailModal(item, `รายละเอียดความคืบหน้าคิว ${item.code}`);
+        }
+
+        function openQueueDetailModal(item, title) {
+            const modal = document.getElementById('queueDetailModal');
+            const titleEl = document.getElementById('queueDetailModalTitle');
+            const bodyEl = document.getElementById('queueDetailModalBody');
+            if (!modal || !bodyEl) return;
+
+            if (titleEl) {
+                titleEl.innerHTML = `
+                    <span class="w-7 h-7 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center shrink-0">
+                        <i class="ph-fill ph-sparkle"></i>
+                    </span>
+                    <span class="truncate">${escapeHtml(title)}</span>
+                `;
+            }
+            bodyEl.innerHTML = buildQueueProgressHtml(item);
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeQueueDetailModal() {
+            const modal = document.getElementById('queueDetailModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // เปิดป๊อปอัปรูปความคืบหน้างาน
+        function openProgressPhotoModal(code) {
+            const item = queuesData.find(q => q.code.toUpperCase() === code.toUpperCase());
+            if (!item) return;
+            const modal = document.getElementById('progressPhotoModal');
+            const img = document.getElementById('progressPhotoImg');
+            const title = document.getElementById('progressPhotoTitle');
+            const caption = document.getElementById('progressPhotoCaption');
+
+            if (title) {
+                title.innerHTML = `<i class="ph-fill ph-image text-pink-500"></i> รูปอัปเดตคิว ${escapeHtml(item.code)}`;
+            }
+            if (img) {
+                img.src = item.progressImage || 'https://placehold.co/600x450/FCE7F3/9333EA?text=Yai+Nori+Work+Progress';
+            }
+            if (caption) {
+                caption.textContent = item.progressImage
+                    ? `${item.service || ''} — ความคืบหน้า ${item.percent || 0}%`
+                    : 'ยังไม่มีรูปภาพอัปเดตสำหรับคิวนี้ (แสดงภาพตัวอย่าง Demo)';
+            }
+
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeProgressPhotoModal() {
+            const modal = document.getElementById('progressPhotoModal');
+            if (!modal) return;
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // ==========================================
+        // เครื่องเล่นแผ่นเสียง CD (Web Audio Music Box + โน้ตลอยฟุ้ง + เล่นอัตโนมัติ)
+        // ==========================================
+        let isMusicPlaying = false;
+        let userManuallyPaused = false;
+        let audioCtx = null;
+        let musicLoopTimer = null;
+        let noteFloatTimer = null;
+        let melodyStep = 0;
+
+        // ทำนองกล่องดนตรีพาสเทลนุ่มๆ (Hz)
+        const musicBoxNotes = [523.25, 659.25, 783.99, 1046.50, 880.00, 783.99, 659.25, 587.33, 659.25, 783.99, 659.25, 523.25];
+
+        function ensureAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            return audioCtx;
+        }
+
+        // ปลดล็อกระบบเสียงสำหรับเบราว์เซอร์มือถือและ iPad Safari ภายในจังหวะที่ผู้ใช้แตะหน้าจอ
+        function unlockAudioContextInGesture() {
+            try {
+                const ctx = ensureAudioContext();
+                if (!ctx) return null;
+                if (ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
+                const silentBuffer = ctx.createBuffer(1, 1, 22050);
+                const source = ctx.createBufferSource();
+                source.buffer = silentBuffer;
+                source.connect(ctx.destination);
+                if (source.start) source.start(0);
+                return ctx;
+            } catch (err) {
+                return audioCtx;
+            }
+        }
+
+        function playMusicBoxTone(freq) {
+            try {
+                const ctx = ensureAudioContext();
+                if (!ctx) return;
+                if (ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
+
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+
+                gain.gain.setValueAtTime(0.001, now);
+                gain.gain.exponentialRampToValueAtTime(0.09, now + 0.03);
+                gain.gain.exponentialRampToValueAtTime(0.0008, now + 0.65);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.7);
+            } catch (err) {
+                // เบราว์เซอร์อาจจำกัดเสียงอัตโนมัติ
+            }
+        }
+
+        function spawnFloatingMusicNote() {
+            const container = document.getElementById('musicNotesContainer');
+            if (!container) return;
+            const symbols = ['♪', '♫', '♬'];
+            const note = document.createElement('span');
+            note.className = 'music-note-float text-sm font-bold';
+            note.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+            note.style.left = `${14 + Math.random() * 34}px`;
+            note.style.top = `${-4 + Math.random() * 14}px`;
+            note.style.setProperty('--nx', `${(Math.random() - 0.3) * 32}px`);
+            container.appendChild(note);
+            setTimeout(() => note.remove(), 2150);
+        }
+
+        function startMusicPlayer() {
+            const ctx = unlockAudioContextInGesture();
+            if (isMusicPlaying) {
+                if (ctx && ctx.state === 'suspended') {
+                    ctx.resume().catch(() => {});
+                }
+                return;
+            }
+
+            const disc = document.getElementById('vinylDisc');
+            const icon = document.getElementById('vinylNoteIcon');
+            isMusicPlaying = true;
+
+            if (disc) disc.classList.add('vinyl-spinning');
+            if (icon) icon.className = 'ph-fill ph-music-notes text-sm animate-pulse';
+
+            playMusicBoxTone(musicBoxNotes[melodyStep % musicBoxNotes.length]);
+            melodyStep++;
+            spawnFloatingMusicNote();
+
+            if (musicLoopTimer) clearInterval(musicLoopTimer);
+            if (noteFloatTimer) clearInterval(noteFloatTimer);
+
+            musicLoopTimer = setInterval(() => {
+                playMusicBoxTone(musicBoxNotes[melodyStep % musicBoxNotes.length]);
+                melodyStep++;
+            }, 620);
+
+            noteFloatTimer = setInterval(() => {
+                spawnFloatingMusicNote();
+            }, 900);
+        }
+
+        function stopMusicPlayer() {
+            const disc = document.getElementById('vinylDisc');
+            const icon = document.getElementById('vinylNoteIcon');
+            isMusicPlaying = false;
+
+            if (disc) disc.classList.remove('vinyl-spinning');
+            if (icon) icon.className = 'ph-fill ph-music-note text-sm';
+            if (musicLoopTimer) clearInterval(musicLoopTimer);
+            if (noteFloatTimer) clearInterval(noteFloatTimer);
+            musicLoopTimer = null;
+            noteFloatTimer = null;
+        }
+
+        function toggleMusicPlayer() {
+            if (isMusicPlaying) {
+                userManuallyPaused = true;
+                stopMusicPlayer();
+            } else {
+                userManuallyPaused = false;
+                startMusicPlayer();
+            }
+        }
+
+        // ระบบเล่นเพลงอัตโนมัติเมื่อเปิดเว็บ หรือเริ่มทันทีที่ผู้ใช้แตะจุดใดก็ได้บนหน้าจอ
+        function initAutoMusicPlay() {
+            try {
+                const ctx = ensureAudioContext();
+                if (ctx && ctx.state === 'running' && !userManuallyPaused && !isMusicPlaying) {
+                    startMusicPlayer();
+                }
+            } catch (err) {
+                // รอผู้ใช้แตะหน้าจอเพื่อปลดล็อกเสียง
+            }
+
+            const removeUnlockListeners = () => {
+                document.removeEventListener('touchstart', unlockOnAnyInteraction, true);
+                document.removeEventListener('touchend', unlockOnAnyInteraction, true);
+                document.removeEventListener('pointerdown', unlockOnAnyInteraction, true);
+                document.removeEventListener('click', unlockOnAnyInteraction, true);
+                document.removeEventListener('keydown', unlockOnAnyInteraction, true);
+            };
+
+            const unlockOnAnyInteraction = (e) => {
+                // หากผู้ใช้แตะตรงปุ่มแผ่นเสียงโดยตรง ให้ปุ่มแผ่นเสียงจัดการเปิด/ปิดเอง
+                if (e.target && e.target.closest && e.target.closest('#vinylWidget')) {
+                    removeUnlockListeners();
+                    return;
+                }
+                if (userManuallyPaused) {
+                    removeUnlockListeners();
+                    return;
+                }
+
+                const ctx = unlockAudioContextInGesture();
+                if (!isMusicPlaying) {
+                    startMusicPlayer();
+                }
+
+                // ถอดตัวดักจับออกเมื่อระบบเสียงปลดล็อกและกำลังเล่นจริงแล้วเท่านั้น
+                if (ctx && ctx.state === 'running' && isMusicPlaying) {
+                    removeUnlockListeners();
+                } else if (ctx) {
+                    ctx.resume().then(() => {
+                        if (ctx.state === 'running' && !userManuallyPaused) {
+                            if (!isMusicPlaying) startMusicPlayer();
+                            removeUnlockListeners();
+                        }
+                    }).catch(() => {});
+                }
+            };
+
+            document.addEventListener('touchstart', unlockOnAnyInteraction, { capture: true, passive: true });
+            document.addEventListener('touchend', unlockOnAnyInteraction, { capture: true, passive: true });
+            document.addEventListener('pointerdown', unlockOnAnyInteraction, { capture: true, passive: true });
+            document.addEventListener('click', unlockOnAnyInteraction, { capture: true });
+            document.addEventListener('keydown', unlockOnAnyInteraction, { capture: true, passive: true });
+        }
+
+        // ==========================================
+        // หน้าโหลดเข้าเว็บ (Loading Screen)
+        // ==========================================
+        function initPageLoader() {
+            const loader = document.getElementById('pageLoader');
+            const bar = document.getElementById('loaderProgressBar');
+            const pctText = document.getElementById('loaderPercentText');
+            const statusText = document.getElementById('loaderStatusText');
+            const runner = document.getElementById('loaderMascotRunner');
+            if (!loader) return;
+
+            let progress = 0;
+            const stageMessages = [
+                { min: 0, text: 'กำลังเตรียมความน่ารักให้คุณหนู... ✨' },
+                { min: 35, text: 'กำลังจัดเรียงคิวงานของร้าน... 🎀' },
+                { min: 75, text: 'เกือบเรียบร้อยแล้วค่ะ รอสักครู่น้า 💖' },
+                { min: 100, text: 'พร้อมแล้วค่ะ ยินดีต้อนรับสู่ Yai Nori 👑' }
+            ];
+
+            const stepTimer = setInterval(() => {
+                const increment = progress < 70 ? Math.floor(Math.random() * 11) + 7 : Math.floor(Math.random() * 8) + 5;
+                progress = Math.min(100, progress + increment);
+
+                if (bar) bar.style.width = `${progress}%`;
+                if (pctText) pctText.textContent = `${progress}%`;
+                if (runner) runner.style.left = `${Math.min(92, Math.max(8, progress))}%`;
+
+                const matchedMsg = [...stageMessages].reverse().find(m => progress >= m.min);
+                if (matchedMsg && statusText) {
+                    statusText.textContent = matchedMsg.text;
+                }
+
+                if (progress >= 100) {
+                    clearInterval(stepTimer);
+                    setTimeout(() => {
+                        loader.classList.add('loader-fade-out');
+                        setTimeout(() => {
+                            loader.classList.add('hidden');
+                        }, 680);
+                    }, 350);
+                }
+            }, 130);
+        }
+
+        // ==========================================
+        // เอฟเฟกต์แตะหน้าจอทุกจุดแบบฟุ้งละมุน (ไม่ใช้อิโมจิ)
+        // ==========================================
+        function initTouchSparkles() {
+            document.addEventListener('pointerdown', (e) => {
+                createSoftSparkleBurst(e.clientX, e.clientY);
+            });
+        }
+
+        function createSoftSparkleBurst(x, y) {
+            // 1. วงแสงฟุ้งเบลอตรงกลาง (Soft Bokeh Halo)
+            const ring = document.createElement('div');
+            ring.className = 'touch-glow-ring';
+            ring.style.left = `${x}px`;
+            ring.style.top = `${y}px`;
+            ring.style.width = '46px';
+            ring.style.height = '46px';
+            document.body.appendChild(ring);
+            setTimeout(() => ring.remove(), 880);
+
+            // 2. ละอองแสงกลมฟุ้ง + ประกายดาวสี่แฉก SVG โปร่งแสง
+            const colors = ['#F9A8D4', '#E879F9', '#D8B4FE', '#FBCFE8', '#FFFFFF'];
+            const count = 9;
+
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'touch-bokeh-particle';
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+
+                const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+                const dist = 22 + Math.random() * 44;
+                const dx = Math.cos(angle) * dist;
+                const dy = Math.sin(angle) * dist - 10;
+                const dur = (0.65 + Math.random() * 0.45).toFixed(2) + 's';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                particle.style.setProperty('--dx', `${dx}px`);
+                particle.style.setProperty('--dy', `${dy}px`);
+                particle.style.setProperty('--dur', dur);
+                particle.style.setProperty('--rot', `${Math.floor((Math.random() - 0.5) * 90)}deg`);
+
+                if (i % 3 === 0) {
+                    // ประกายดาวสี่แฉก SVG ละมุน
+                    const size = 10 + Math.random() * 10;
+                    particle.innerHTML = `
+                        <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${color}" style="filter: drop-shadow(0 0 5px ${color});">
+                            <path d="M12 0L14.8 9.2L24 12L14.8 14.8L12 24L9.2 14.8L0 12L9.2 9.2Z"/>
+                        </svg>
+                    `;
+                } else {
+                    // ละอองแสง Bokeh ฟุ้งๆ
+                    const orbSize = 5 + Math.random() * 9;
+                    particle.style.width = `${orbSize}px`;
+                    particle.style.height = `${orbSize}px`;
+                    particle.style.borderRadius = '9999px';
+                    particle.style.background = `radial-gradient(circle, #FFFFFF 0%, ${color} 60%, transparent 100%)`;
+                    particle.style.boxShadow = `0 0 10px ${color}`;
+                    particle.style.filter = 'blur(0.6px)';
+                }
+
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 1150);
+            }
+        }
+
+        // ==========================================
+        // กล่องแจ้งเตือนแบบน่ารัก (แทน alert / confirm) & เมนูนำทาง
+        // ==========================================
+        function showDialog(title, message, customActionsHtml = '') {
+            const dialog = document.getElementById('customDialog');
+            const titleEl = document.getElementById('dialogTitle');
+            const msgEl = document.getElementById('dialogMessage');
+            const actionsEl = document.getElementById('dialogActions');
+            if (!dialog) return;
+
+            if (titleEl) titleEl.textContent = title || 'แจ้งเตือน';
+            if (msgEl) msgEl.textContent = message || '';
+            if (actionsEl) {
+                actionsEl.innerHTML = customActionsHtml || `
+                    <button type="button" onclick="closeDialog()" class="btn-princess px-5 py-2 rounded-2xl text-white text-xs font-semibold">
+                        ตกลงค่ะ 🎀
+                    </button>
+                `;
+            }
+            dialog.classList.remove('hidden');
+            dialog.classList.add('flex');
+        }
+
+        function closeDialog() {
+            const dialog = document.getElementById('customDialog');
+            if (!dialog) return;
+            dialog.classList.add('hidden');
+            dialog.classList.remove('flex');
+        }
+
+        function copyTextFallback(text) {
+            try {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = text;
+                tempInput.style.position = 'fixed';
+                tempInput.style.opacity = '0';
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                showDialog('คัดลอกเรียบร้อยแล้วค่ะ ✨', `คัดลอก "${text}" ลงคลิปบอร์ดแล้วนะคะ`);
+            } catch (err) {
+                showDialog('ข้อมูลการติดต่อ', text);
+            }
+        }
+
+        function toggleDrawerMenu() {
+            const drawer = document.getElementById('drawerMenu');
+            const backdrop = document.getElementById('drawerBackdrop');
+            if (!drawer || !backdrop) return;
+            const isClosed = drawer.classList.contains('translate-x-full');
+            if (isClosed) {
+                drawer.classList.remove('translate-x-full');
+                backdrop.classList.remove('hidden');
+            } else {
+                drawer.classList.add('translate-x-full');
+                backdrop.classList.add('hidden');
+            }
+        }
+
+        function scrollToSection(sectionId) {
+            const el = document.getElementById(sectionId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function openContactInfo(type) {
+            let title = 'ช่องทางติดต่อ';
+            let value = '';
+            let desc = '';
+
+            if (type === 'phone') {
+                title = 'โทรศัพท์ติดต่อร้าน 📞';
+                value = contactInfo.phone;
+                desc = `เบอร์ติดต่อ: ${value}`;
+            } else if (type === 'line') {
+                title = 'LINE Official 💬';
+                value = contactInfo.line;
+                desc = `แอดไลน์ได้ที่: ${value}`;
+            } else {
+                title = 'ส่งข้อความ / เพจร้าน 💌';
+                value = contactInfo.message;
+                desc = `ติดต่อผ่านช่องทาง: ${value}`;
+            }
+
+            const actionsHtml = `
+                <button type="button" onclick="copyTextFallback('${escapeHtml(value)}')" class="btn-princess px-4 py-2 rounded-2xl text-white text-xs font-semibold">
+                    คัดลอกข้อมูล
+                </button>
+                <button type="button" onclick="closeDialog()" class="px-4 py-2 rounded-2xl bg-pink-50 border border-pink-200 text-pink-600 text-xs font-semibold">
+                    ปิด
+                </button>
+            `;
+            showDialog(title, desc, actionsHtml);
+        }
+
+        // ==========================================
+        // ระบบหลังบ้าน (Admin Modal, จัดการระดับความคืบหน้า, คิวงาน และตั้งค่าเว็บ)
+        // ==========================================
+        function toggleAdminModal() {
+            const modal = document.getElementById('adminModal');
+            const banner = document.getElementById('adminBanner');
+            if (!modal) return;
+
+            const isHidden = modal.classList.contains('hidden');
+            if (isHidden) {
+                renderProgressStagesUI();
+                renderAdminQueueList();
+                syncSettingsInputs();
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                if (banner) banner.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                if (banner) banner.classList.add('hidden');
+            }
+        }
+
+        function switchAdminTab(tabName) {
+            const queuesTab = document.getElementById('adminTab-queues');
+            const settingsTab = document.getElementById('adminTab-settings');
+            const queuesBtn = document.getElementById('tabBtn-queues');
+            const settingsBtn = document.getElementById('tabBtn-settings');
+
+            const activeClasses = ['bg-white', 'text-pink-600', 'font-semibold', 'border-t', 'border-x', 'border-pink-200', '-mb-px'];
+            const inactiveClasses = ['text-princess-textMuted', 'font-medium', 'hover:text-pink-600'];
+
+            if (tabName === 'settings') {
+                if (queuesTab) queuesTab.classList.add('hidden');
+                if (settingsTab) settingsTab.classList.remove('hidden');
+                if (queuesBtn) {
+                    queuesBtn.classList.remove(...activeClasses);
+                    queuesBtn.classList.add(...inactiveClasses);
+                }
+                if (settingsBtn) {
+                    settingsBtn.classList.remove(...inactiveClasses);
+                    settingsBtn.classList.add(...activeClasses);
+                }
+                syncSettingsInputs();
+            } else {
+                if (settingsTab) settingsTab.classList.add('hidden');
+                if (queuesTab) queuesTab.classList.remove('hidden');
+                if (settingsBtn) {
+                    settingsBtn.classList.remove(...activeClasses);
+                    settingsBtn.classList.add(...inactiveClasses);
+                }
+                if (queuesBtn) {
+                    queuesBtn.classList.remove(...inactiveClasses);
+                    queuesBtn.classList.add(...activeClasses);
+                }
+                renderProgressStagesUI();
+                renderAdminQueueList();
+            }
+        }
+
+        // แสดงและอัปเดตตัวเลือกระดับความคืบหน้า (Select + รายการจัดการเพิ่ม/แก้ไข/ลบ)
+        function renderProgressStagesUI() {
+            const selectEl = document.getElementById('formStep');
+            const listEl = document.getElementById('adminStagesList');
+
+            if (selectEl) {
+                const prevVal = selectEl.value;
+                selectEl.innerHTML = progressStages.map((stage, idx) => `
+                    <option value="${stage.id}">ขั้นที่ ${idx + 1}: ${escapeHtml(stage.name)} (${stage.defaultPercent}%)</option>
+                `).join('');
+                if (progressStages.some(s => String(s.id) === String(prevVal))) {
+                    selectEl.value = prevVal;
+                }
+            }
+
+            if (listEl) {
+                listEl.innerHTML = progressStages.map((stage, idx) => `
+                    <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-white p-2.5 rounded-xl border border-pink-100 text-xs">
+                        <span class="px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 font-semibold text-[11px] shrink-0">ขั้น ${idx + 1}</span>
+                        <input type="text" id="stageNameInput-${stage.id}" value="${escapeHtml(stage.name)}" class="flex-1 min-w-[120px] px-2.5 py-1.5 rounded-lg border border-pink-200 focus:outline-none focus:border-pink-400">
+                        <div class="flex items-center gap-1 shrink-0">
+                            <input type="number" id="stagePctInput-${stage.id}" min="0" max="100" value="${stage.defaultPercent}" class="w-16 px-2 py-1.5 rounded-lg border border-pink-200 text-center focus:outline-none focus:border-pink-400">
+                            <span class="text-princess-textMuted">%</span>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <button type="button" onclick="updateProgressStage(${stage.id})" class="px-2.5 py-1.5 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-600 font-medium border border-pink-200 transition">
+                                บันทึก
+                            </button>
+                            <button type="button" onclick="deleteProgressStage(${stage.id})" class="px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-500 font-medium border border-rose-200 transition">
+                                ลบ
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function addProgressStage() {
+            const nameInput = document.getElementById('newStageName');
+            const pctInput = document.getElementById('newStagePercent');
+            const name = (nameInput?.value || '').trim();
+            const pct = Math.min(100, Math.max(0, parseInt(pctInput?.value || '50', 10) || 0));
+
+            if (!name) {
+                showDialog('กรุณากรอกชื่อขั้นความคืบหน้า', 'ระบุชื่อระดับความคืบหน้าที่ต้องการเพิ่มก่อนนะคะ 🎀');
+                return;
+            }
+
+            progressStages.push({
+                id: nextStageId++,
+                name,
+                defaultPercent: pct
+            });
+
+            if (nameInput) nameInput.value = '';
+            if (pctInput) pctInput.value = '50';
+
+            renderProgressStagesUI();
+            renderAdminQueueList();
+            refreshAllViews();
+            showDialog('เพิ่มระดับความคืบหน้าแล้ว ✨', `เพิ่มขั้น "${name}" (${pct}%) เรียบร้อยค่ะ`);
+        }
+
+        function updateProgressStage(stageId) {
+            const stage = progressStages.find(s => s.id === stageId);
+            if (!stage) return;
+
+            const nameEl = document.getElementById(`stageNameInput-${stageId}`);
+            const pctEl = document.getElementById(`stagePctInput-${stageId}`);
+            const newName = (nameEl?.value || '').trim();
+            const newPct = Math.min(100, Math.max(0, parseInt(pctEl?.value || '0', 10) || 0));
+
+            if (!newName) {
+                showDialog('ชื่อขั้นว่างไม่ได้ค่ะ', 'กรุณากรอกชื่อระดับความคืบหน้าให้ครบถ้วนนะคะ');
+                return;
+            }
+
+            const oldName = stage.name;
+            stage.name = newName;
+            stage.defaultPercent = newPct;
+
+            // อัปเดตชื่อสถานะของคิวที่ใช้ชื่อขั้นเดิมอยู่ให้ตรงกัน
+            queuesData.forEach(q => {
+                if (q.step === stageId && q.statusText === oldName) {
+                    q.statusText = newName;
+                }
+            });
+
+            renderProgressStagesUI();
+            renderAdminQueueList();
+            refreshAllViews();
+            showDialog('อัปเดตขั้นความคืบหน้าแล้ว ✨', `บันทึกขั้น "${newName}" (${newPct}%) เรียบร้อยค่ะ`);
+        }
+
+        function deleteProgressStage(stageId) {
+            if (progressStages.length <= 1) {
+                showDialog('ไม่สามารถลบได้', 'ระบบต้องมีระดับความคืบหน้าอย่างน้อย 1 ขั้นค่ะ 🎀');
+                return;
+            }
+
+            progressStages = progressStages.filter(s => s.id !== stageId);
+            const fallbackStage = progressStages[0];
+
+            queuesData.forEach(q => {
+                if (q.step === stageId) {
+                    q.step = fallbackStage.id;
+                    q.statusText = fallbackStage.name;
+                    q.percent = fallbackStage.defaultPercent;
+                }
+            });
+
+            renderProgressStagesUI();
+            renderAdminQueueList();
+            refreshAllViews();
+            showDialog('ลบขั้นความคืบหน้าแล้ว', 'ปรับปรุงรายการระดับความคืบหน้าเรียบร้อยค่ะ');
+        }
+
+        function syncPercentWithStep() {
+            const stepEl = document.getElementById('formStep');
+            const pctEl = document.getElementById('formProgressPercent');
+            const statusTextEl = document.getElementById('formStatusText');
+            if (!stepEl) return;
+
+            const selectedId = parseInt(stepEl.value, 10);
+            const stage = progressStages.find(s => s.id === selectedId);
+            if (!stage) return;
+
+            if (pctEl) pctEl.value = stage.defaultPercent;
+            if (statusTextEl) {
+                const currentText = statusTextEl.value.trim();
+                const isStageName = progressStages.some(s => s.name === currentText);
+                if (!currentText || isStageName) {
+                    statusTextEl.value = stage.name;
+                }
+            }
+        }
+
+        // แสดงรายการคิวในหลังบ้านพร้อมปุ่มเปลี่ยนสถานะด่วน
+        function renderAdminQueueList() {
+            const container = document.getElementById('adminQueueList');
+            if (!container) return;
+
+            if (queuesData.length === 0) {
+                container.innerHTML = `<div class="text-center py-4 text-xs text-princess-textMuted bg-princess-bg rounded-2xl border border-pink-100">ยังไม่มีคิวในระบบค่ะ</div>`;
+                return;
+            }
+
+            container.innerHTML = queuesData.map((item, idx) => {
+                const stageButtons = progressStages.map(stage => {
+                    const isActive = item.step === stage.id;
+                    return `
+                        <button type="button" onclick="quickChangeStage(${idx}, ${stage.id})" class="px-2.5 py-1 rounded-full text-[11px] font-medium border transition ${
+                            isActive
+                                ? 'bg-pink-500 text-white border-pink-500 shadow-xs'
+                                : 'bg-white text-princess-textMuted border-pink-200 hover:border-pink-400 hover:text-pink-600'
+                        }">
+                            ${escapeHtml(stage.name)}
+                        </button>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="p-3 rounded-2xl bg-white border border-pink-200/80 shadow-xs space-y-2 text-xs">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="font-cute font-bold text-sm text-pink-600">${escapeHtml(item.code)}</span>
+                                    <span class="font-semibold text-princess-textDark">${escapeHtml(item.customer)}</span>
+                                    <span class="px-2 py-0.5 rounded-full bg-purple-50 text-purple-600 text-[10px] font-semibold">${item.percent ?? 0}%</span>
+                                </div>
+                                <div class="text-[11px] text-princess-textMuted truncate mt-0.5">${escapeHtml(item.service || '-')}</div>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button type="button" onclick="editQueueItem(${idx})" class="px-2.5 py-1 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-600 font-medium">แก้ไข</button>
+                                <button type="button" onclick="confirmDeleteQueue(${idx})" class="px-2.5 py-1 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 font-medium">ลบ</button>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5 pt-1 border-t border-pink-50">
+                            ${stageButtons}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function quickChangeStage(idx, stageId) {
+            const item = queuesData[idx];
+            const stage = progressStages.find(s => s.id === stageId);
+            if (!item || !stage) return;
+
+            item.step = stage.id;
+            item.statusText = stage.name;
+            item.percent = stage.defaultPercent;
+
+            renderAdminQueueList();
+            refreshAllViews();
+        }
+
+        function saveQueueForm(event) {
+            if (event) event.preventDefault();
+            const editIdx = parseInt(document.getElementById('editQueueIndex')?.value ?? '-1', 10);
+            const code = (document.getElementById('formQueueCode')?.value || '').trim().toUpperCase();
+            const customer = (document.getElementById('formCustomer')?.value || '').trim();
+            const service = (document.getElementById('formService')?.value || '').trim();
+            const step = parseInt(document.getElementById('formStep')?.value || String(progressStages[0]?.id ?? 1), 10);
+            const selectedStage = progressStages.find(s => s.id === step) || progressStages[0];
+            const statusText = (document.getElementById('formStatusText')?.value || '').trim() || (selectedStage ? selectedStage.name : 'รอคิว');
+            const subStatus = (document.getElementById('formSubStatus')?.value || '').trim();
+            const percent = Math.min(100, Math.max(0, parseInt(document.getElementById('formProgressPercent')?.value || '0', 10) || 0));
+            const progressImage = (document.getElementById('formProgressImage')?.value || '').trim();
+
+            if (!code || !customer) {
+                showDialog('กรอกข้อมูลไม่ครบ', 'กรุณากรอกเลขคิวและชื่อลูกค้าให้ครบถ้วนนะคะ 🎀');
+                return;
+            }
+
+            const payload = { code, customer, service, statusText, subStatus, step, percent, progressImage };
+
+            if (editIdx >= 0 && editIdx < queuesData.length) {
+                queuesData[editIdx] = payload;
+                showDialog('บันทึกการแก้ไขแล้ว ✨', `อัปเดตข้อมูลคิว ${code} เรียบร้อยค่ะ`);
+            } else {
+                queuesData.push(payload);
+                showDialog('เพิ่มคิวใหม่สำเร็จ ✨', `เพิ่มคิว ${code} เข้าสู่ระบบเรียบร้อยค่ะ`);
+            }
+
+            resetQueueForm();
+            renderAdminQueueList();
+            refreshAllViews();
+        }
+
+        function editQueueItem(idx) {
+            const item = queuesData[idx];
+            if (!item) return;
+
+            document.getElementById('editQueueIndex').value = idx;
+            document.getElementById('formQueueCode').value = item.code || '';
+            document.getElementById('formCustomer').value = item.customer || '';
+            document.getElementById('formService').value = item.service || '';
+            document.getElementById('formStatusText').value = item.statusText || '';
+            document.getElementById('formSubStatus').value = item.subStatus || '';
+            document.getElementById('formStep').value = item.step ?? (progressStages[0]?.id ?? 1);
+            document.getElementById('formProgressPercent').value = item.percent ?? 0;
+            document.getElementById('formProgressImage').value = item.progressImage || '';
+
+            document.getElementById('formQueueCode')?.focus();
+        }
+
+        function confirmDeleteQueue(idx) {
+            const item = queuesData[idx];
+            if (!item) return;
+            const actionsHtml = `
+                <button type="button" onclick="executeDeleteQueue(${idx})" class="px-4 py-2 rounded-2xl bg-rose-500 text-white text-xs font-semibold hover:bg-rose-600">
+                    ยืนยันลบคิว
+                </button>
+                <button type="button" onclick="closeDialog()" class="px-4 py-2 rounded-2xl bg-pink-50 border border-pink-200 text-pink-600 text-xs font-semibold">
+                    ยกเลิก
+                </button>
+            `;
+            showDialog('ยืนยันการลบคิว', `ต้องการลบคิว ${item.code} (${item.customer}) ใช่ไหมคะ?`, actionsHtml);
+        }
+
+        function executeDeleteQueue(idx) {
+            queuesData.splice(idx, 1);
+            closeDialog();
+            renderAdminQueueList();
+            refreshAllViews();
+        }
+
+        function resetQueueForm() {
+            const idxEl = document.getElementById('editQueueIndex');
+            if (idxEl) idxEl.value = '-1';
+            ['formQueueCode', 'formCustomer', 'formService', 'formStatusText', 'formSubStatus', 'formProgressImage'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const stepEl = document.getElementById('formStep');
+            if (stepEl && progressStages[0]) {
+                stepEl.value = progressStages[0].id;
+            }
+            const pctEl = document.getElementById('formProgressPercent');
+            if (pctEl && progressStages[0]) {
+                pctEl.value = progressStages[0].defaultPercent;
+            }
+        }
+
+        // ซิงก์ค่าตั้งต้นไปยังหน้าตั้งค่าหลังบ้าน
+        function syncSettingsInputs() {
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+            setVal('settingShopName', document.getElementById('displayShopName')?.textContent.trim() || 'Yai Nori');
+            setVal('settingShopSub', document.getElementById('displayShopSub')?.textContent.trim() || '');
+            setVal('settingLogoUrl', shopLogoUrl);
+            setVal('settingBannerUrl', bannerImageUrl);
+            setVal('settingRunnerPngUrl', runnerPngUrl);
+            setVal('settingChatLeftPngUrl', chatLeftPngUrl);
+            setVal('settingChatRightPngUrl', chatRightPngUrl);
+            setVal('settingMascotFloatUrl', mascotWidgetPngUrl);
+            setVal('settingMascotMessages', mascotAutoMessages.join('\n'));
+            setVal('settingPhone', contactInfo.phone);
+            setVal('settingLine', contactInfo.line);
+            setVal('settingMessage', contactInfo.message);
+        }
+
+        // บันทึกการตั้งค่ารูปภาพและข้อมูลเว็บไซต์
+        function saveSiteSettings() {
+            const shopName = (document.getElementById('settingShopName')?.value || '').trim() || 'Yai Nori';
+            const shopSub = (document.getElementById('settingShopSub')?.value || '').trim();
+            const newLogo = (document.getElementById('settingLogoUrl')?.value || '').trim();
+            const newBanner = (document.getElementById('settingBannerUrl')?.value || '').trim();
+            const newRunner = (document.getElementById('settingRunnerPngUrl')?.value || '').trim();
+            const newChatLeft = (document.getElementById('settingChatLeftPngUrl')?.value || '').trim();
+            const newChatRight = (document.getElementById('settingChatRightPngUrl')?.value || '').trim();
+            const newMascotFloat = (document.getElementById('settingMascotFloatUrl')?.value || '').trim();
+            const rawMessages = document.getElementById('settingMascotMessages')?.value || '';
+
+            const displayShopName = document.getElementById('displayShopName');
+            const loaderShopName = document.getElementById('loaderShopName');
+            const displayShopSub = document.getElementById('displayShopSub');
+            if (displayShopName) displayShopName.textContent = shopName;
+            if (loaderShopName) loaderShopName.textContent = shopName;
+            if (displayShopSub) displayShopSub.textContent = shopSub;
+
+            if (newLogo) {
+                shopLogoUrl = newLogo;
+                ['headerLogo', 'drawerLogo', 'mascotAvatarImg', 'vinylLogoImg', 'loaderLogoImg'].forEach(id => {
+                    const img = document.getElementById(id);
+                    if (img) img.src = shopLogoUrl;
+                });
+            }
+
+            if (newBanner) bannerImageUrl = newBanner;
+            if (newRunner) runnerPngUrl = newRunner;
+            if (newChatLeft) chatLeftPngUrl = newChatLeft;
+            if (newChatRight) chatRightPngUrl = newChatRight;
+
+            if (newMascotFloat) {
+                mascotWidgetPngUrl = newMascotFloat;
+                const mascotImg = document.getElementById('floatingMascotPng');
+                if (mascotImg) mascotImg.src = mascotWidgetPngUrl;
+                const loaderRunnerImg = document.querySelector('#loaderMascotRunner img');
+                if (loaderRunnerImg) loaderRunnerImg.src = mascotWidgetPngUrl;
+            }
+
+            mascotAutoMessages = rawMessages
+                .split('\n')
+                .map(line => line.trim())
+                .filter(Boolean);
+
+            contactInfo.phone = (document.getElementById('settingPhone')?.value || '').trim() || contactInfo.phone;
+            contactInfo.line = (document.getElementById('settingLine')?.value || '').trim() || contactInfo.line;
+            contactInfo.message = (document.getElementById('settingMessage')?.value || '').trim() || contactInfo.message;
+
+            window.startMascotAutoMessages();
+            refreshAllViews();
+            showDialog('อัปเดตหน้าเว็บเรียบร้อยแล้วค่ะ ✨', 'ข้อมูลร้าน รูปภาพ และข้อความมาสคอตถูกปรับปรุงบนหน้าเว็บแล้วนะคะ');
+        }
+
+        // เริ่มต้นทำงานทั้งหมดเมื่อหน้าเว็บโหลดเสร็จ
+        window.addEventListener('DOMContentLoaded', () => {
+            initPageLoader();
+            renderProgressStagesUI();
+            refreshAllViews();
+            window.startMascotAutoMessages();
+            initTouchSparkles();
+            initAutoMusicPlay();
+        });
+    </script>
+</body>
+</html>
